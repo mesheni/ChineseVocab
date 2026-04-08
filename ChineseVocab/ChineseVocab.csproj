@@ -80,4 +80,11 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Converters\" />
+	  <Folder Include="Extensions\" />
+	  <Folder Include="SRS\" />
+	  <Folder Include="Utils\" />
+	</ItemGroup>
+
 </Project>
