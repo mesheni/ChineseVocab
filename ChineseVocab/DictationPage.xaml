@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:ChineseVocab.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="ChineseVocab.DictationPage"
+             x:DataType="viewModels:DictationViewModel"
+             Title="Диктант">
+
+    <ContentPage.BindingContext>
+        <viewModels:DictationViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto"
+          Padding="20"
+          RowSpacing="20">
+
+        <!-- Заголовок и прогресс -->
+        <Frame Grid.Row="0"
+               Padding="15"
+               CornerRadius="10"
+               BackgroundColor="{StaticResource Secondary}"
+               HasShadow="True">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="✍️ Диктант"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"/>
+
+                <ProgressBar Progress="{Binding Progress}"
+                             ProgressColor="{StaticResource Primary}"/>
+
+                <Grid ColumnDefinitions="*,*">
+                    <Label Grid.Column="0"
+                           Text="{Binding ProgressText}"
+                           FontSize="14"
+                           HorizontalOptions="Start"/>
+
+                    <Label Grid.Column="1"
+                           Text="{Binding CorrectCount, StringFormat='Правильно: {0}'}"
+                           FontSize="14"
+                           HorizontalOptions="End"
+                           TextColor="{StaticResource Primary}"/>
+                </Grid>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Основная область задания -->
+        <Frame Grid.Row="1"
+               Padding="30"
+               CornerRadius="15"
+               BackgroundColor="{StaticResource Surface}"
+               HasShadow="True"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
+
+            <VerticalStackLayout Spacing="25"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+
+                <!-- Инструкция -->
+                <Label Text="Напишите иероглиф, который вы слышите:"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+
+                <!-- Область для отображения задания (после проверки или с подсказкой) -->
+                <VerticalStackLayout Spacing="15">
+
+                    <!-- Текст диктовки (показывается после проверки) -->
+                    <Label Text="{Binding DictationText}"
+                           FontSize="48"
+                           FontFamily="Microsoft YaHei"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding IsAnswerChecked}"
+                           TextColor="{StaticResource Primary}"/>
+
+                    <!-- Подсказки (пиньинь и перевод) -->
+                    <VerticalStackLayout Spacing="5"
+                                         IsVisible="{Binding IsAnswerChecked}">
+
+                        <Label Text="{Binding PinyinHint}"
+                               FontSize="20"
+                               HorizontalOptions="Center"
+                               TextColor="{StaticResource Secondary}"/>
+
+                        <Label Text="{Binding DefinitionHint}"
+                               FontSize="16"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="WordWrap"/>
+                    </VerticalStackLayout>
+
+                    <!-- Сообщение о результате проверки -->
+                    <Label Text="{Binding CheckResultMessage}"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{Binding IsAnswerCorrect, Converter={StaticResource BoolToColorConverter}}"
+                           LineBreakMode="WordWrap"/>
+                </VerticalStackLayout>
+
+                <!-- Поле для ввода ответа -->
+                <Entry Text="{Binding UserInput}"
+                       Placeholder="Введите иероглиф здесь..."
+                       FontSize="24"
+                       FontFamily="Microsoft YaHei"
+                       HorizontalOptions="Fill"
+                       HorizontalTextAlignment="Center"
+                       IsEnabled="{Binding IsAnswerChecked, Converter={StaticResource InvertedBoolConverter}}"
+                       Completed="OnEntryCompleted"/>
+
+                <!-- Кнопка подсказки -->
+                <Button Text="Показать подсказку"
+                        Command="{Binding ShowHintCommand}"
+                        IsVisible="{Binding IsAnswerChecked, Converter={StaticResource InvertedBoolConverter}}"
+                        BackgroundColor="{StaticResource Secondary}"
+                        TextColor="{StaticResource OnSecondary}"
+                        CornerRadius="10"
+                        HeightRequest="45"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Панель с основными кнопками управления -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*,*"
+              ColumnSpacing="15">
+
+            <!-- Кнопка проверки (только если ответ не проверен) -->
+            <Button Grid.Column="0"
+                    Text="Проверить"
+                    Command="{Binding CheckAnswerCommand}"
+                    IsVisible="{Binding IsAnswerChecked, Converter={StaticResource InvertedBoolConverter}}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+            <!-- Кнопка следующего задания (только если ответ проверен) -->
+            <Button Grid.Column="0"
+                    Text="Следующее"
+                    Command="{Binding NextItemCommand}"
+                    IsVisible="{Binding IsAnswerChecked}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+            <!-- Кнопка новой сессии -->
+            <Button Grid.Column="1"
+                    Text="Новая сессия"
+                    Command="{Binding StartNewSessionCommand}"
+                    BackgroundColor="{StaticResource Secondary}"
+                    TextColor="{StaticResource OnSecondary}"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+            <!-- Кнопка настроек -->
+            <Button Grid.Column="2"
+                    Text="Настройки"
+                    Command="{Binding OpenSettingsCommand}"
+                    BackgroundColor="{StaticResource Secondary}"
+                    TextColor="{StaticResource OnSecondary}"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+        </Grid>
+
+        <!-- Нижняя панель с кнопкой возврата -->
+        <Frame Grid.Row="3"
+               Padding="15"
+               CornerRadius="10"
+               BackgroundColor="{StaticResource Secondary}"
+               HasShadow="True">
+
+            <Button Text="Вернуться на главную"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+        </Frame>
+
+        <!-- Индикатор загрузки -->
+        <ActivityIndicator Grid.RowSpan="4"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource Primary}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+
+    </Grid>
+</ContentPage>

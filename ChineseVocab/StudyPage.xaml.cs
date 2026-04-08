@@ -1,10 +1,10 @@
-﻿using ChineseVocab.ViewModels;
+using ChineseVocab.ViewModels;
 
 namespace ChineseVocab
 {
-    public partial class MainPage : ContentPage
+    public partial class StudyPage : ContentPage
     {
-        public MainPage()
+        public StudyPage()
         {
             InitializeComponent();
         }
@@ -13,7 +13,7 @@ namespace ChineseVocab
         {
             base.OnAppearing();
 
-            if (BindingContext is MainViewModel viewModel)
+            if (BindingContext is StudyViewModel viewModel)
             {
                 await viewModel.InitializeAsync();
             }
@@ -23,7 +23,7 @@ namespace ChineseVocab
         {
             base.OnDisappearing();
 
-            if (BindingContext is MainViewModel viewModel)
+            if (BindingContext is StudyViewModel viewModel)
             {
                 await viewModel.OnDisappearingAsync();
             }
