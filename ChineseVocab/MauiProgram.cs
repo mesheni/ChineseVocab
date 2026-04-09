@@ -5,7 +5,6 @@ using CommunityToolkit.Maui.Markup;
 using ChineseVocab.ViewModels;
 using ChineseVocab.Services;
 
-
 namespace ChineseVocab
 {
     public static class MauiProgram

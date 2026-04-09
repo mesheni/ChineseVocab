@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using SQLite;
 using ChineseVocab.Models;
+using ChineseVocab.Services;
+using ChineseVocab.Data.Migrations;
 
 namespace ChineseVocab.Services
 {
@@ -37,23 +39,27 @@ namespace ChineseVocab.Services
                 var databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chinesevocab.db3");
                 _database = new SQLiteAsyncConnection(databasePath);
 
-                // Создаем таблицы
-                await _database.CreateTableAsync<Card>();
-                await _database.CreateTableAsync<Deck>();
-                await _database.CreateTableAsync<Sentence>();
-                await _database.CreateTableAsync<CharacterType>();
-                await _database.CreateTableAsync<SRSStat>();
+                // Создаем сервис миграций и применяем все ожидающие миграции
+                var migrations = MigrationRegistry.GetAllMigrations();
+                var migrationService = new MigrationService(_database, migrations);
 
-                // Создаем таблицу для связи карточек и колод (многие-ко-многим)
-                await _database.ExecuteAsync(@"
-                    CREATE TABLE IF NOT EXISTS CardDeck (
-                        CardId INTEGER NOT NULL,
-                        DeckId INTEGER NOT NULL,
-                        AddedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        PRIMARY KEY (CardId, DeckId),
-                        FOREIGN KEY (CardId) REFERENCES Cards(Id) ON DELETE CASCADE,
-                        FOREIGN KEY (DeckId) REFERENCES Decks(Id) ON DELETE CASCADE
-                    )");
+                // Инициализируем таблицу миграций и применяем миграции
+                await migrationService.InitializeAsync();
+                int appliedMigrations = await migrationService.MigrateAsync();
+
+                Console.WriteLine($"Применено миграций: {appliedMigrations}");
+
+                // Загружаем начальные данные (типы иероглифов, HSK1 карточки и т.д.)
+                var dataSeeder = new DataSeeder(this);
+                bool dataSeeded = await dataSeeder.SeedAsync();
+                if (dataSeeded)
+                {
+                    Console.WriteLine("Начальные данные успешно загружены.");
+                }
+                else
+                {
+                    Console.WriteLine("Начальные данные уже были загружены ранее или загрузка не потребовалась.");
+                }
 
                 _isInitialized = true;
                 Console.WriteLine("База данных инициализирована успешно");
