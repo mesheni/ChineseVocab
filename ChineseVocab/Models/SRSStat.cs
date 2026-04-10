@@ -1,5 +1,6 @@
 using SQLite;
 using CommunityToolkit.Mvvm.ComponentModel;
+// using ChineseVocab.SRS; - временно закомментировано из-за ошибок компиляции
 
 namespace ChineseVocab.Models
 {
@@ -144,8 +145,8 @@ namespace ChineseVocab.Models
         {
             CardId = cardId;
             NextReviewDate = DateTime.UtcNow.Date; // Первое повторение сегодня
-            Interval = 1;
-            EFactor = 2.5;
+            Interval = ChineseVocab.SRS.SRSEngine.FirstReviewInterval;
+            EFactor = ChineseVocab.SRS.SRSEngine.DefaultEFactor;
             RepetitionCount = 0;
             EaseScore = 3;
             LastReviewed = DateTime.MinValue;
@@ -172,50 +173,34 @@ namespace ChineseVocab.Models
             LastReviewed = DateTime.UtcNow;
             EaseScore = quality;
 
-            if (quality < 3)
+            // Используем SRSEngine для обработки повторения
+            var (newInterval, newRepetitionCount, newEFactor) =
+                ChineseVocab.SRS.SRSEngine.ProcessReview(Interval, RepetitionCount, EFactor, quality);
+
+            if (quality < ChineseVocab.SRS.SRSEngine.MinimumPassingQuality)
             {
                 // Неправильный или плохой ответ - сбрасываем прогресс
                 RepetitionCount = 0;
-                Interval = 1;
                 CorrectStreak = 0;
                 TotalIncorrect++;
             }
             else
             {
                 // Правильный ответ
-                RepetitionCount++;
+                RepetitionCount = newRepetitionCount;
                 CorrectStreak++;
                 TotalCorrect++;
-
-                // Обновляем фактор легкости по формуле SM-2
-                EFactor = EFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-
-                // Ограничиваем EFactor в диапазоне 1.3 - 2.5
-                if (EFactor < 1.3)
-                    EFactor = 1.3;
-                if (EFactor > 2.5)
-                    EFactor = 2.5;
-
-                // Рассчитываем новый интервал
-                if (RepetitionCount == 1)
-                {
-                    Interval = 1;
-                }
-                else if (RepetitionCount == 2)
-                {
-                    Interval = 6;
-                }
-                else
-                {
-                    Interval = (int)Math.Round(Interval * EFactor);
-                }
             }
+
+            // Обновляем интервал и фактор легкости из результата SRSEngine
+            Interval = newInterval;
+            EFactor = newEFactor;
 
             // Рассчитываем следующую дату повторения
             NextReviewDate = DateTime.UtcNow.AddDays(Interval);
 
-            // Проверяем, выучена ли карточка (интервал больше 21 дня)
-            if (Interval >= 21 && !IsLearned)
+            // Проверяем, выучена ли карточка
+            if (ChineseVocab.SRS.SRSEngine.IsCardLearned(Interval) && !IsLearned)
             {
                 IsLearned = true;
                 LearnedDate = DateTime.UtcNow;
@@ -257,7 +242,7 @@ namespace ChineseVocab.Models
         /// </summary>
         public void Reset()
         {
-            Interval = 1;
+            Interval = ChineseVocab.SRS.SRSEngine.FirstReviewInterval;
             RepetitionCount = 0;
             CorrectStreak = 0;
             NextReviewDate = DateTime.UtcNow.Date;

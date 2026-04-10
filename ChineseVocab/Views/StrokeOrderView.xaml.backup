@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             xmlns:viewModels="clr-namespace:ChineseVocab.ViewModels"
+             x:Class="ChineseVocab.Views.StrokeOrderView"
+             x:Name="StrokeOrderControl">
+
+    <ContentView.BindingContext>
+        <viewModels:StrokeOrderViewModel />
+    </ContentView.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto"
+          Padding="20"
+          RowSpacing="15">
+
+        <!-- Header -->
+        <Frame Grid.Row="0"
+               Padding="15"
+               CornerRadius="10"
+               BackgroundColor="{StaticResource Secondary}"
+               HasShadow="True">
+            <Grid ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="15">
+
+                <!-- Character -->
+                <Frame Grid.Column="0"
+                       Padding="20"
+                       CornerRadius="8"
+                       BackgroundColor="{StaticResource Surface}"
+                       HasShadow="True">
+                    <Label Text="{Binding Character}"
+                           FontSize="48"
+                           FontFamily="Microsoft YaHei"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Frame>
+
+                <!-- Info -->
+                <VerticalStackLayout Grid.Column="1"
+                                     Spacing="8">
+                    <Label Text="Порядок черт"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource OnSecondary}"/>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto,*"
+                          ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Всего черт:"
+                               FontSize="14"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TotalStrokes}"
+                               FontSize="14"
+                               FontAttributes="Bold"/>
+
+                        <Label Grid.Column="2"
+                               Text="Текущая:"
+                               FontSize="14"/>
+                        <Label Grid.Column="3"
+                               Text="{Binding CurrentStrokeNumber}"
+                               FontSize="14"
+                               FontAttributes="Bold"/>
+                    </Grid>
+
+                    <Label Text="{Binding StrokeRules}"
+                           FontSize="12"
+                           LineBreakMode="WordWrap"
+                           MaxLines="2"/>
+                </VerticalStackLayout>
+
+                <!-- Close button -->
+                <Button Grid.Column="2"
+                        Text="✕"
+                        Command="{Binding CloseCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource OnSecondary}"
+                        FontSize="18"
+                        HorizontalOptions="End"/>
+            </Grid>
+        </Frame>
+
+        <!-- Drawing canvas -->
+        <Frame Grid.Row="1"
+               Padding="10"
+               CornerRadius="10"
+               BackgroundColor="White"
+               HasShadow="True">
+            <skia:SKCanvasView x:Name="DrawingCanvas"
+                               PaintSurface="OnCanvasPaintSurface"
+                               EnableTouchEvents="True"
+                               Touch="OnCanvasTouch"
+                               HorizontalOptions="Fill"
+                               VerticalOptions="Fill"/>
+        </Frame>
+
+        <!-- Controls -->
+        <Frame Grid.Row="2"
+               Padding="15"
+               CornerRadius="10"
+               BackgroundColor="{StaticResource Surface}"
+               HasShadow="True">
+            <VerticalStackLayout Spacing="15">
+
+                <!-- Animation controls -->
+                <Grid ColumnDefinitions="*,*,*,*,*"
+                      ColumnSpacing="10">
+
+                    <Button Grid.Column="0"
+                            Text="⏮"
+                            Command="{Binding RewindCommand}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="40"/>
+
+                    <Button Grid.Column="1"
+                            Text="{Binding PlayButtonText}"
+                            Command="{Binding ToggleAnimationCommand}"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="40"/>
+
+                    <Button Grid.Column="2"
+                            Text="⏹"
+                            Command="{Binding StopAnimationCommand}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="40"/>
+
+                    <Button Grid.Column="3"
+                            Text="⏭"
+                            Command="{Binding StepForwardCommand}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="40"/>
+
+                    <Button Grid.Column="4"
+                            Text="🔄"
+                            Command="{Binding ResetAnimationCommand}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="40"/>
+                </Grid>
+
+                <!-- Speed control -->
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Скорость:"
+                               FontSize="14"/>
+                        <Label Grid.Column="2"
+                               Text="{Binding AnimationSpeed}x"
+                               FontSize="14"
+                               FontAttributes="Bold"/>
+                    </Grid>
+
+                    <Slider Minimum="0.25"
+                            Maximum="2.0"
+                            Value="{Binding AnimationSpeed}"
+                            MinimumTrackColor="{StaticResource Primary}"
+                            MaximumTrackColor="{StaticResource Secondary}"
+                            ThumbColor="{StaticResource Primary}"/>
+                </VerticalStackLayout>
+
+                <!-- Settings -->
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="20">
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="10"
+                          VerticalOptions="Center">
+                        <Switch Grid.Column="0"
+                                IsToggled="{Binding ShowGrid}"
+                                OnColor="{StaticResource Primary}"/>
+                        <Label Grid.Column="1"
+                               Text="Сетка"
+                               FontSize="14"
+                               VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="10"
+                          VerticalOptions="Center">
+                        <Switch Grid.Column="0"
+                                IsToggled="{Binding IsPracticeMode}"
+                                OnColor="{StaticResource Primary}"/>
+                        <Label Grid.Column="1"
+                               Text="Практика"
+                               FontSize="14"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Grid>
+
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="{StaticResource Primary}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+
+        <!-- Error message -->
+        <Frame Grid.Row="1"
+               Padding="20"
+               CornerRadius="10"
+               BackgroundColor="#FEE2E2"
+               IsVisible="{Binding HasError}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="⚠️ Ошибка загрузки"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="#DC2626"/>
+                <Label Text="{Binding ErrorMessage}"
+                       FontSize="14"
+                       LineBreakMode="WordWrap"
+                       MaxLines="3"
+                       TextColor="#DC2626"/>
+                <Button Text="Повторить"
+                        Command="{Binding RetryLoadCommand}"
+                        BackgroundColor="#DC2626"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="40"/>
+            </VerticalStackLayout>
+        </Frame>
+
+    </Grid>
+</ContentView>

@@ -51,6 +51,9 @@ namespace ChineseVocab
 
             // Регистрация сервиса статистики
             services.AddSingleton<IStatisticsService, StatisticsService>();
+
+            // Регистрация сервиса планирования повторений
+            services.AddSingleton<ISchedulerService, SchedulerService>();
         }
 
         private static void RegisterViewModels(IServiceCollection services)

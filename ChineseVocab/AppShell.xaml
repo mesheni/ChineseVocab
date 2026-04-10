@@ -21,4 +21,19 @@
         ContentTemplate="{DataTemplate local:DictationPage}"
         Route="DictationPage" />
 
+    <ShellContent
+        Title="Character Library"
+        ContentTemplate="{DataTemplate local:CharacterLibraryPage}"
+        Route="CharacterLibraryPage" />
+
+    <ShellContent
+        Title="Sentences"
+        ContentTemplate="{DataTemplate local:SentencesPage}"
+        Route="SentencesPage" />
+
+    <ShellContent
+        Title="Statistics"
+        ContentTemplate="{DataTemplate local:StatisticsPage}"
+        Route="StatisticsPage" />
+
 </Shell>

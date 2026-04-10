@@ -6,12 +6,26 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChineseVocab.Models;
+using ChineseVocab.SRS;
 
 namespace ChineseVocab.ViewModels
 {
     /// <summary>
     /// ViewModel для страницы изучения карточек с системой интервальных повторений (SRS).
     /// </summary>
+    /// <summary>
+    /// Режимы изучения карточек.
+    /// </summary>
+    public enum StudyMode
+    {
+        /// <summary>Изучение новых карточек</summary>
+        New,
+        /// <summary>Повторение изученных карточек</summary>
+        Review,
+        /// <summary>Смешанный режим (новые + повторение)</summary>
+        Mixed
+    }
+
     public partial class StudyViewModel : BaseViewModel
     {
         private readonly Random _random = new Random();
@@ -73,6 +87,21 @@ namespace ChineseVocab.ViewModels
         }
 
         /// <summary>
+        /// Команда для оценки карточки.
+        /// </summary>
+        public ICommand RateCardCommand => new AsyncRelayCommand<string?>(RateCardAsync);
+
+        /// <summary>
+        /// Команда для открытия настроек.
+        /// </summary>
+        public new ICommand OpenSettingsCommand => new AsyncRelayCommand(OpenSettingsAsync);
+
+        /// <summary>
+        /// Команда для возврата назад.
+        /// </summary>
+        public new ICommand GoBackCommand => new AsyncRelayCommand(GoBackAsync);
+
+        /// <summary>
         /// Команда для показа ответа (пиньинь и перевода).
         /// </summary>
         [RelayCommand]
@@ -83,27 +112,44 @@ namespace ChineseVocab.ViewModels
         }
 
         /// <summary>
-        /// Команда для оценки карточки пользователем (оценка от 1 до 5).
+        /// Команда для оценки карточки пользователем (оценка от 0 до 5).
         /// Вызывает алгоритм SRS для расчета следующего интервала повторения.
         /// </summary>
-        [RelayCommand]
-        private async Task RateCardAsync(int rating)
+        private async Task RateCardAsync(string? ratingString)
         {
-            if (rating < 1 || rating > 5)
+            if (string.IsNullOrWhiteSpace(ratingString) || !int.TryParse(ratingString, out int rating) || rating < 0 || rating > 5)
                 return;
 
             IsBusy = true;
 
             try
             {
-                // Здесь будет вызов SRS движка для обработки оценки
-                // ProcessCardWithSRS(CurrentCard, rating);
+                // Временная интеграция SRS для демонстрации
+                // В реальном приложении здесь будет вызов сервиса SRS
+                int currentInterval = 1;
+                int currentRepetitionCount = 0;
+                double currentEFactor = SRSEngine.DefaultEFactor;
 
-                // Логирование для отладки
+                // Обработка оценки с помощью алгоритма SM-2
+                var (newInterval, newRepetitionCount, newEFactor) =
+                    SRSEngine.ProcessReview(currentInterval, currentRepetitionCount, currentEFactor, rating);
+
                 Console.WriteLine($"Card rated: {CurrentCard.Character}, Rating: {rating}");
+                Console.WriteLine($"SRS: interval={newInterval} days, repetitions={newRepetitionCount}, E-Factor={newEFactor:F2}");
 
                 // Обновляем статистику
                 _totalCardsStudied++;
+                CardsStudiedToday++;
+
+                // Если оценка 3 и выше - считаем правильным ответом
+                if (rating >= SRSEngine.MinimumPassingQuality)
+                {
+                    CorrectAnswersToday++;
+                }
+
+                // Добавляем время изучения (примерно 1 минута на карточку)
+                StudyTimeMinutesToday += 1;
+
                 UpdateProgress();
 
                 // Загружаем следующую карточку
@@ -255,6 +301,112 @@ namespace ChineseVocab.ViewModels
             // Сохраняем прогресс сессии
             // await SaveStudySessionAsync();
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Текущий режим изучения карточек.
+        /// </summary>
+        [ObservableProperty]
+        private StudyMode _currentStudyMode = StudyMode.Mixed;
+
+        /// <summary>
+        /// Текстовое описание текущего режима изучения.
+        /// </summary>
+        public string CurrentStudyModeDescription => CurrentStudyMode switch
+        {
+            StudyMode.New => "Изучение новых карточек",
+            StudyMode.Review => "Повторение изученных карточек",
+            StudyMode.Mixed => "Смешанный режим (новые + повторение)",
+            _ => "Неизвестный режим"
+        };
+
+        /// <summary>
+        /// Доступные режимы изучения карточек.
+        /// </summary>
+        public List<StudyMode> StudyModes { get; } = new List<StudyMode>
+        {
+            StudyMode.New,
+            StudyMode.Review,
+            StudyMode.Mixed
+        };
+
+        /// <summary>
+        /// Количество новых карточек для изучения в сессии.
+        /// </summary>
+        [ObservableProperty]
+        private int _newCardsLimit = 10;
+
+        /// <summary>
+        /// <summary>
+        /// Количество карточек для повторения в сессии.
+        /// </summary>
+        [ObservableProperty]
+        private int _reviewCardsLimit = 20;
+
+        /// <summary>
+        /// Общее количество карточек изученных сегодня.
+        /// </summary>
+        [ObservableProperty]
+        private int _cardsStudiedToday = 0;
+
+        /// <summary>
+        /// Количество правильных ответов сегодня.
+        /// </summary>
+        [ObservableProperty]
+        private int _correctAnswersToday = 0;
+
+        /// <summary>
+        /// Процент правильных ответов сегодня.
+        /// </summary>
+        public double AccuracyRateToday => CardsStudiedToday > 0
+            ? (double)CorrectAnswersToday / CardsStudiedToday * 100.0
+            : 0.0;
+
+        /// <summary>
+        /// Текущая серия дней подряд с изучением.
+        /// </summary>
+        [ObservableProperty]
+        private int _currentStreak = 0;
+
+        /// <summary>
+        /// Максимальная серия дней подряд с изучением.
+        /// </summary>
+        [ObservableProperty]
+        private int _maxStreak = 0;
+
+        /// <summary>
+        /// Дата последнего изучения.
+        /// </summary>
+        [ObservableProperty]
+        private DateTime _lastStudyDate = DateTime.MinValue;
+
+        /// <summary>
+        /// Общее время изучения сегодня (в минутах).
+        /// </summary>
+        [ObservableProperty]
+        private int _studyTimeMinutesToday = 0;
+
+        /// <summary>
+        /// Команда для изменения режима изучения.
+        /// </summary>
+        [RelayCommand]
+        private void ChangeStudyMode(string modeString)
+        {
+            if (Enum.TryParse<StudyMode>(modeString, true, out var mode))
+            {
+                CurrentStudyMode = mode;
+                // В будущем здесь будет перезагрузка карточек в соответствии с режимом
+                Console.WriteLine($"Study mode changed to: {mode}");
+            }
+            else
+            {
+                Console.WriteLine($"Invalid study mode: {modeString}");
+            }
+        }
+
+        partial void OnCurrentStudyModeChanged(StudyMode value)
+        {
+            OnPropertyChanged(nameof(CurrentStudyModeDescription));
         }
     }
 }

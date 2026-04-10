@@ -37,7 +37,7 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
+		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://ya.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
@@ -81,10 +81,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Converters\" />
-	  <Folder Include="Extensions\" />
-	  <Folder Include="SRS\" />
-	  <Folder Include="Utils\" />
+		<Folder Include="Converters\" />
+		<Folder Include="Extensions\" />
+		<Folder Include="SRS\" />
+		<Folder Include="Utils\" />
+		<Folder Include="Tests\" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="Tests\**" />
+	</ItemGroup>
+
+
 
 </Project>

@@ -93,7 +93,33 @@ namespace ChineseVocab.ViewModels
         /// <summary>
         /// Команда для начала новой сессии диктанта.
         /// </summary>
-        [RelayCommand]
+        public ICommand StartNewSessionCommand => new AsyncRelayCommand(StartNewSessionAsync);
+
+        /// <summary>
+        /// Команда для проверки введенного пользователем текста.
+        /// </summary>
+        public ICommand CheckAnswerCommand => new RelayCommand(CheckAnswer);
+
+        /// <summary>
+        /// Команда для перехода к следующему заданию.
+        /// </summary>
+        public ICommand NextItemCommand => new RelayCommand(NextItem);
+
+        /// <summary>
+        /// Команда для показа подсказки (пиньинь и перевод).
+        /// </summary>
+        public ICommand ShowHintCommand => new AsyncRelayCommand(ShowHintAsync);
+
+        /// <summary>
+        /// Команда для открытия настроек.
+        /// </summary>
+        public new ICommand OpenSettingsCommand => new AsyncRelayCommand(OpenSettingsAsync);
+
+        /// <summary>
+        /// Команда для возврата назад.
+        /// </summary>
+        public new ICommand GoBackCommand => new AsyncRelayCommand(GoBackAsync);
+
         private async Task StartNewSessionAsync()
         {
             IsBusy = true;
@@ -118,10 +144,6 @@ namespace ChineseVocab.ViewModels
             }
         }
 
-        /// <summary>
-        /// Команда для проверки введенного пользователем текста.
-        /// </summary>
-        [RelayCommand]
         private void CheckAnswer()
         {
             if (string.IsNullOrWhiteSpace(UserInput))
@@ -147,20 +169,12 @@ namespace ChineseVocab.ViewModels
             UpdateProgress();
         }
 
-        /// <summary>
-        /// Команда для перехода к следующему заданию.
-        /// </summary>
-        [RelayCommand]
         private void NextItem()
         {
             LoadNextDictationItem();
             ResetCheckState();
         }
 
-        /// <summary>
-        /// Команда для показа подсказки (пиньинь и перевод).
-        /// </summary>
-        [RelayCommand]
         private async Task ShowHintAsync()
         {
             await Shell.Current.DisplayAlertAsync("Подсказка",

@@ -18,46 +18,63 @@ namespace ChineseVocab.ViewModels
         /// <summary>
         /// Команда для перехода к модулю изучения карточек.
         /// </summary>
-        [RelayCommand]
+        public ICommand GoToStudyCommand => new AsyncRelayCommand(GoToStudyAsync);
+
+        /// <summary>
+        /// Команда для перехода к модулю диктанта.
+        /// </summary>
+        public ICommand GoToDictationCommand => new AsyncRelayCommand(GoToDictationAsync);
+
+        /// <summary>
+        /// Команда для перехода к базе иероглифов (БКРС).
+        /// </summary>
+        public ICommand GoToCharacterLibraryCommand => new AsyncRelayCommand(GoToCharacterLibraryAsync);
+
+        /// <summary>
+        /// Команда для перехода к модулю предложений.
+        /// </summary>
+        public ICommand GoToSentencesCommand => new AsyncRelayCommand(GoToSentencesAsync);
+
+        /// <summary>
+        /// Команда для перехода к статистике.
+        /// </summary>
+        public ICommand GoToStatisticsCommand => new AsyncRelayCommand(GoToStatisticsAsync);
+
         private async Task GoToStudyAsync()
         {
-            await Shell.Current.GoToAsync("StudyPage");
+            await Shell.Current.GoToAsync("///StudyPage");
         }
 
         /// <summary>
         /// Команда для перехода к модулю диктанта.
         /// </summary>
-        [RelayCommand]
         private async Task GoToDictationAsync()
         {
-            await Shell.Current.GoToAsync("DictationPage");
+            await Shell.Current.GoToAsync("///DictationPage");
         }
 
         /// <summary>
         /// Команда для перехода к базе иероглифов (БКРС).
         /// </summary>
-        [RelayCommand]
         private async Task GoToCharacterLibraryAsync()
         {
-            await Shell.Current.GoToAsync("CharacterLibraryPage");
+            await Shell.Current.GoToAsync("///CharacterLibraryPage");
         }
 
         /// <summary>
         /// Команда для перехода к модулю предложений.
         /// </summary>
-        [RelayCommand]
         private async Task GoToSentencesAsync()
         {
-            await Shell.Current.GoToAsync("SentencesPage");
+            await Shell.Current.GoToAsync("///SentencesPage");
         }
 
         /// <summary>
         /// Команда для перехода к статистике.
         /// </summary>
-        [RelayCommand]
         private async Task GoToStatisticsAsync()
         {
-            await Shell.Current.GoToAsync("StatisticsPage");
+            await Shell.Current.GoToAsync("///StatisticsPage");
         }
 
         /// <summary>

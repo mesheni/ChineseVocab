@@ -2,10 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:ChineseVocab.ViewModels"
+             xmlns:converters="clr-namespace:ChineseVocab.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ChineseVocab.StudyPage"
              x:DataType="viewModels:StudyViewModel"
              Title="Изучение карточек">
+
+    <ContentPage.Resources>
+        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <converters:StudyModeToColorConverter x:Key="StudyModeToColorConverter" />
+    </ContentPage.Resources>
 
     <ContentPage.BindingContext>
         <viewModels:StudyViewModel />
@@ -33,11 +39,75 @@
                 <Label Text="{Binding ProgressText}"
                        FontSize="14"
                        HorizontalOptions="Center"/>
+
+                <!-- Выбор режима изучения -->
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Режим изучения:"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="{StaticResource Secondary}"/>
+
+                    <Grid ColumnDefinitions="*,*,*"
+                          ColumnSpacing="10"
+                          HorizontalOptions="Center">
+
+                        <!-- Новые карточки -->
+                        <Frame Grid.Column="0"
+                               Padding="10"
+                               CornerRadius="8"
+                               BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=New}"
+                               HasShadow="True">
+                            <Button Text="Новые"
+                                    Command="{Binding ChangeStudyModeCommand}"
+                                    CommandParameter="New"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="40"/>
+                        </Frame>
+
+                        <!-- Повторение -->
+                        <Frame Grid.Column="1"
+                               Padding="10"
+                               CornerRadius="8"
+                               BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=Review}"
+                               HasShadow="True">
+                            <Button Text="Повторение"
+                                    Command="{Binding ChangeStudyModeCommand}"
+                                    CommandParameter="Review"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="40"/>
+                        </Frame>
+
+                        <!-- Смешанный -->
+                        <Frame Grid.Column="2"
+                               Padding="10"
+                               CornerRadius="8"
+                               BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=Mixed}"
+                               HasShadow="True">
+                            <Button Text="Смешанный"
+                                    Command="{Binding ChangeStudyModeCommand}"
+                                    CommandParameter="Mixed"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="40"/>
+                        </Frame>
+                    </Grid>
+
+                    <Label Text="{Binding CurrentStudyModeDescription}"
+                           FontSize="12"
+                           HorizontalOptions="Center"
+                           TextColor="{StaticResource Secondary}"/>
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </Frame>
 
         <!-- Основная область карточки -->
-        <Frame Grid.Row="1"
+        <Frame x:Name="CardFrame"
+               Grid.Row="1"
                Padding="30"
                CornerRadius="15"
                BackgroundColor="{StaticResource Surface}"
@@ -112,11 +182,27 @@
                    FontSize="16"
                    HorizontalOptions="Center"/>
 
-            <Grid ColumnDefinitions="*,*,*,*,*"
+            <Grid ColumnDefinitions="*,*,*,*,*,*"
                   ColumnSpacing="10">
 
-                <!-- Оценка 1: Не знаю -->
+                <!-- Оценка 0: Полный провал -->
                 <Frame Grid.Column="0"
+                       Padding="10"
+                       CornerRadius="8"
+                       BackgroundColor="#8B0000"
+                       HasShadow="True">
+                    <Button Text="0"
+                            Command="{Binding RateCardCommand}"
+                            CommandParameter="0"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            HeightRequest="50"/>
+                </Frame>
+
+                <!-- Оценка 1: Не знаю -->
+                <Frame Grid.Column="1"
                        Padding="10"
                        CornerRadius="8"
                        BackgroundColor="#FF6B6B"
@@ -132,7 +218,7 @@
                 </Frame>
 
                 <!-- Оценка 2: Почти -->
-                <Frame Grid.Column="1"
+                <Frame Grid.Column="2"
                        Padding="10"
                        CornerRadius="8"
                        BackgroundColor="#FFA500"
@@ -148,7 +234,7 @@
                 </Frame>
 
                 <!-- Оценка 3: Средне -->
-                <Frame Grid.Column="2"
+                <Frame Grid.Column="3"
                        Padding="10"
                        CornerRadius="8"
                        BackgroundColor="#FFD700"
@@ -164,7 +250,7 @@
                 </Frame>
 
                 <!-- Оценка 4: Хорошо -->
-                <Frame Grid.Column="3"
+                <Frame Grid.Column="4"
                        Padding="10"
                        CornerRadius="8"
                        BackgroundColor="#90EE90"
@@ -180,7 +266,7 @@
                 </Frame>
 
                 <!-- Оценка 5: Отлично -->
-                <Frame Grid.Column="4"
+                <Frame Grid.Column="5"
                        Padding="10"
                        CornerRadius="8"
                        BackgroundColor="#32CD32"
@@ -196,7 +282,7 @@
                 </Frame>
             </Grid>
 
-            <Label Text="1: Не знаю, 2: Почти, 3: Средне, 4: Хорошо, 5: Отлично"
+            <Label Text="0: Полный провал, 1: Не знаю, 2: Почти, 3: Средне, 4: Хорошо, 5: Отлично"
                    FontSize="12"
                    HorizontalOptions="Center"
                    TextColor="{StaticResource Secondary}"/>
