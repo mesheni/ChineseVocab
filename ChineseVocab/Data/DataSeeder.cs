@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChineseVocab.Models;
-using SQLite;
 
 namespace ChineseVocab.Services
 {
@@ -14,8 +13,12 @@ namespace ChineseVocab.Services
     public class DataSeeder
     {
         private readonly IDatabaseService _databaseService;
-        private readonly SQLiteAsyncConnection _database;
-        private bool _isSeeded = false;
+
+        /// <summary>
+        /// Статический флаг: была ли уже выполнена начальная загрузка данных.
+        /// Предотвращает повторный посев при создании новых экземпляров DataSeeder.
+        /// </summary>
+        private static bool _isSeeded = false;
 
         /// <summary>
         /// Инициализирует новый экземпляр сервиса загрузки данных.
@@ -24,10 +27,6 @@ namespace ChineseVocab.Services
         public DataSeeder(IDatabaseService databaseService)
         {
             _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
-
-            // Получаем путь к базе данных для прямого доступа SQLite
-            var databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "chinesevocab.db3");
-            _database = new SQLiteAsyncConnection(databasePath);
         }
 
         /// <summary>
@@ -372,14 +371,6 @@ namespace ChineseVocab.Services
             }
 
             return sentences;
-        }
-
-        /// <summary>
-        /// Сбрасывает флаг загрузки данных (для тестирования).
-        /// </summary>
-        public void Reset()
-        {
-            _isSeeded = false;
         }
     }
 }
