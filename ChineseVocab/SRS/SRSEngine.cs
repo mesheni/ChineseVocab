@@ -151,7 +151,7 @@ namespace ChineseVocab.SRS
             {
                 // Правильный ответ
                 newRepetitionCount = currentRepetitionCount + 1;
-                newInterval = CalculateNextInterval(currentInterval, newRepetitionCount, newEFactor, quality);
+                newInterval = CalculateNextInterval(currentInterval, currentRepetitionCount, newEFactor, quality);
             }
 
             return (newInterval, newRepetitionCount, newEFactor);
