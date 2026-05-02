@@ -12,9 +12,9 @@ namespace ChineseVocab.Services
     /// </summary>
     public class SchedulerService : ISchedulerService
     {
-        private readonly ISRSService _srsService;
-        private readonly IDatabaseService _databaseService;
-        private readonly INotificationService _notificationService;
+        private readonly ISRSService _srsService = null!;
+        private readonly IDatabaseService _databaseService = null!;
+        private readonly INotificationService _notificationService = null!;
         private NotificationSettings _notificationSettings;
         private Dictionary<DateTime, List<Card>> _cachedSchedule;
         private DateTime _cacheLastUpdated;
@@ -23,13 +23,11 @@ namespace ChineseVocab.Services
         /// <summary>
         /// Конструктор сервиса планирования.
         /// </summary>
-        public SchedulerService(ISRSService srsService, IDatabaseService databaseService)
+        public SchedulerService(ISRSService srsService, IDatabaseService databaseService, INotificationService notificationService)
         {
             _srsService = srsService ?? throw new ArgumentNullException(nameof(srsService));
             _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
-
-            // Инициализация сервиса уведомлений (будет реализован отдельно)
-            _notificationService = null; // TODO: Реализовать сервис уведомлений
+            _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
             _notificationSettings = new NotificationSettings();
             _cachedSchedule = new Dictionary<DateTime, List<Card>>();
@@ -384,7 +382,7 @@ namespace ChineseVocab.Services
         /// </summary>
         public async Task SendDailyReminderNotificationAsync()
         {
-            if (_notificationService == null || !_notificationSettings.Enabled)
+            if (!_notificationSettings.Enabled)
                 return;
 
             var cardsDueToday = await GetTodayCardsAsync();
@@ -406,8 +404,7 @@ namespace ChineseVocab.Services
                 message = $"Сегодня {cardsDueToday.Count} карточек для повторения. Уделите несколько минут!";
             }
 
-            // TODO: Реализовать отправку уведомления через _notificationService
-            // await _notificationService.SendNotificationAsync(title, message);
+            await _notificationService.SendNotificationAsync(title, message);
         }
 
         /// <summary>
@@ -415,7 +412,7 @@ namespace ChineseVocab.Services
         /// </summary>
         public async Task CheckAndNotifyOverdueCardsAsync()
         {
-            if (_notificationService == null || !_notificationSettings.NotifyOnOverdue)
+            if (!_notificationSettings.NotifyOnOverdue)
                 return;
 
             var overdueCards = await GetOverdueCardsAsync();
@@ -425,8 +422,7 @@ namespace ChineseVocab.Services
                 string title = "ChineseVocab - просроченные карточки";
                 string message = $"У вас {overdueCards.Count} просроченных карточек. Не забудьте их повторить!";
 
-                // TODO: Реализовать отправку уведомления через _notificationService
-                // await _notificationService.SendNotificationAsync(title, message);
+                await _notificationService.SendNotificationAsync(title, message);
             }
         }
 
@@ -928,12 +924,4 @@ namespace ChineseVocab.Services
         #endregion
     }
 
-    /// <summary>
-    /// Интерфейс сервиса уведомлений (для будущей реализации).
-    /// </summary>
-    internal interface INotificationService
-    {
-        Task SendNotificationAsync(string title, string message);
-        Task<bool> RequestNotificationPermissionAsync();
-    }
 }

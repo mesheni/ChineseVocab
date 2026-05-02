@@ -53,6 +53,7 @@ namespace ChineseVocab
             services.AddSingleton<IStatisticsService, StatisticsService>();
 
             // Регистрация сервиса планирования повторений
+            services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<ISchedulerService, SchedulerService>();
         }
 
