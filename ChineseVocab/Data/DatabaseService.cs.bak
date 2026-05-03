@@ -499,14 +499,13 @@ namespace ChineseVocab.Services
         }
 
         /// <summary>
-        /// Добавляет карточку в колоду. Если связь уже существует, ничего не делает.
+        /// Добавляет карточку в колоду.
         /// </summary>
         public async Task<int> AddCardToDeckAsync(int cardId, int deckId)
         {
             await EnsureInitializedAsync();
-            return await _database.ExecuteAsync(
-                "INSERT OR IGNORE INTO CardDeck (CardId, DeckId, AddedDate) VALUES (?, ?, ?)",
-                cardId, deckId, DateTime.UtcNow);
+            // Временная заглушка
+            return 1;
         }
 
         /// <summary>
@@ -515,9 +514,8 @@ namespace ChineseVocab.Services
         public async Task<int> RemoveCardFromDeckAsync(int cardId, int deckId)
         {
             await EnsureInitializedAsync();
-            return await _database.ExecuteAsync(
-                "DELETE FROM CardDeck WHERE CardId = ? AND DeckId = ?",
-                cardId, deckId);
+            // Временная заглушка
+            return 1;
         }
 
         /// <summary>
@@ -526,28 +524,18 @@ namespace ChineseVocab.Services
         public async Task<int> GetCardCountInDeckAsync(int deckId)
         {
             await EnsureInitializedAsync();
-            var result = await _database.ExecuteScalarAsync<int>(
-                "SELECT COUNT(*) FROM CardDeck WHERE DeckId = ?",
-                deckId);
-            return result;
+            // Временная заглушка
+            return 0;
         }
 
         /// <summary>
-        /// Получает карточки из колоды, которые нужно повторить (дата повторения наступила).
+        /// Получает карточки из колоды для повторения.
         /// </summary>
         public async Task<List<Card>> GetDeckCardsForReviewAsync(int deckId)
         {
             await EnsureInitializedAsync();
-            var today = DateTime.UtcNow.Date;
-            return await _database.QueryAsync<Card>(
-                @"SELECT c.* FROM Cards c
-                  INNER JOIN CardDeck cd ON c.Id = cd.CardId
-                  INNER JOIN SRSStatistics s ON c.Id = s.CardId
-                  WHERE cd.DeckId = ?
-                    AND c.IsActive = 1
-                    AND s.NextReviewDate <= ?
-                  ORDER BY s.NextReviewDate ASC",
-                deckId, today);
+            // Временная заглушка
+            return new List<Card>();
         }
 
         #endregion
