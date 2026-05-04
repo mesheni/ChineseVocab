@@ -72,8 +72,8 @@ namespace ChineseVocab
             services.AddTransient<StudyViewModel>();
             services.AddTransient<DictationViewModel>();
 
+            services.AddTransient<CharacterLibraryViewModel>();
             // TODO: Добавить остальные ViewModels по мере создания
-            // services.AddTransient<CharacterLibraryViewModel>();
             // services.AddTransient<SentencesViewModel>();
             // services.AddTransient<StatisticsViewModel>();
         }

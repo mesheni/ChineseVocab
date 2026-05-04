@@ -4,31 +4,163 @@
              x:Class="ChineseVocab.CharacterLibraryPage"
              Title="База иероглифов">
 
-    <ContentPage.BindingContext>
-        <!-- ViewModel will be set later -->
-    </ContentPage.BindingContext>
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
+        <!-- Поиск -->
+        <SearchBar Grid.Row="0"
+                   Placeholder="Поиск по иероглифу, пиньиню или переводу..."
+                   Text="{Binding SearchText}"
+                   SearchCommand="{Binding SearchCommand}"
+                   FontSize="14"/>
 
-            <Label Text="База иероглифов (БКРС)"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="{StaticResource Primary}"/>
+        <!-- Фильтры -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8">
+                <!-- HSK -->
+                <Frame Padding="8,4" CornerRadius="16" BackgroundColor="{StaticResource Surface}"
+                       HasShadow="False" BorderColor="{StaticResource Secondary}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="HSK:" FontSize="13" VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding HskLevels}"
+                                SelectedIndex="{Binding SelectedHskLevel}"
+                                FontSize="13" MinimumWidthRequest="60"/>
+                    </HorizontalStackLayout>
+                </Frame>
 
-            <Label Text="Здесь будет отображаться база китайских иероглифов с поиском и фильтрацией."
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"/>
+                <!-- Тип -->
+                <Frame Padding="8,4" CornerRadius="16" BackgroundColor="{StaticResource Surface}"
+                       HasShadow="False" BorderColor="{StaticResource Secondary}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="Тип:" FontSize="13" VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding CharacterTypes}"
+                                SelectedItem="{Binding SelectedCharacterType}"
+                                FontSize="13" MinimumWidthRequest="120"/>
+                    </HorizontalStackLayout>
+                </Frame>
 
-            <Label Text="Страница в разработке..."
-                   FontSize="14"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"
-                   TextColor="{StaticResource Secondary}"/>
+                <!-- Сортировка -->
+                <Frame Padding="8,4" CornerRadius="16" BackgroundColor="{StaticResource Surface}"
+                       HasShadow="False" BorderColor="{StaticResource Secondary}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="Сорт:" FontSize="13" VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding SortModes}"
+                                SelectedIndex="0"
+                                x:Name="SortPicker"
+                                FontSize="13" MinimumWidthRequest="110"/>
+                    </HorizontalStackLayout>
+                </Frame>
+            </HorizontalStackLayout>
+        </ScrollView>
 
-        </VerticalStackLayout>
-    </ScrollView>
+        <!-- Сводка -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <Label Text="{Binding ResultSummary}" FontSize="14" TextColor="{StaticResource Secondary}"
+                   VerticalOptions="Center"/>
+            <ActivityIndicator Grid.Column="1"
+                               IsRunning="{Binding IsSearching}"
+                               IsVisible="{Binding IsSearching}"
+                               HeightRequest="20" WidthRequest="20"
+                               Color="{StaticResource Primary}"
+                               HorizontalOptions="End"/>
+        </Grid>
 
+        <!-- Список иероглифов -->
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding CardGroups}"
+                        IsGrouped="True"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedCard}"
+                        SelectionChangedCommand="{Binding SelectCardCommand}"
+                        SelectionChangedCommandParameter="{Binding SelectedCard}">
+
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate>
+                    <Frame Padding="12,6" Margin="0,8,0,4" CornerRadius="8"
+                           BackgroundColor="{StaticResource Secondary}">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="📚" FontSize="16" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" FontSize="15" FontAttributes="Bold"
+                                   TextColor="White" VerticalOptions="Center">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1} шт.)">
+                                        <Binding Path="GroupName"/>
+                                        <Binding Path="Count"/>
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="12" Margin="0,2" CornerRadius="10"
+                           BackgroundColor="{StaticResource Surface}" HasShadow="True">
+                        <Grid ColumnDefinitions="56,*,Auto,Auto" ColumnSpacing="12">
+
+                            <!-- Иероглиф -->
+                            <Frame Grid.Column="0" Padding="6" CornerRadius="8"
+                                   BackgroundColor="#F5F5F5" HasShadow="False"
+                                   HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="{Binding Character}"
+                                       FontSize="28"
+                                       FontFamily="Microsoft YaHei"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Frame>
+
+                            <!-- Пиньинь + перевод -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                <Label Text="{Binding Pinyin}"
+                                       FontSize="15"
+                                       TextColor="{StaticResource Primary}"
+                                       LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding Definition}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource Secondary}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2"/>
+                            </VerticalStackLayout>
+
+                            <!-- HSK бейдж -->
+                            <Frame Grid.Column="2" Padding="8,3" CornerRadius="10"
+                                   BackgroundColor="{StaticResource Primary}" HasShadow="False"
+                                   VerticalOptions="Center" IsVisible="{Binding HskLevel, Converter={StaticResource IntToBoolConverter}}">
+                                <Label FontSize="11" TextColor="White"
+                                       VerticalOptions="Center">
+                                    <Label.Text>
+                                        <Binding Path="HskLevel" StringFormat="HSK {0}"/>
+                                    </Label.Text>
+                                </Label>
+                            </Frame>
+
+                            <!-- Черты -->
+                            <Label Grid.Column="3"
+                                   FontSize="12"
+                                   TextColor="{StaticResource Secondary}"
+                                   VerticalOptions="Center"
+                                   HorizontalTextAlignment="Center">
+                                <Label.Text>
+                                    <Binding Path="StrokeCount" StringFormat="{}{0} ч."/>
+                                </Label.Text>
+                            </Label>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Padding="40">
+                    <Label Text="🔍" FontSize="48" HorizontalOptions="Center"/>
+                    <Label Text="Ничего не найдено" FontSize="18" HorizontalOptions="Center"
+                           TextColor="{StaticResource Secondary}"/>
+                    <Label Text="Попробуйте изменить параметры поиска или фильтры."
+                           FontSize="14" HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Secondary}"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </Grid>
 </ContentPage>
