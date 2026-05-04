@@ -163,9 +163,21 @@ namespace ChineseVocab.ViewModels
 
         public StrokeOrderViewModel()
         {
-            // Временная инициализация для дизайн-тайма
+            // Пытаемся получить ICharacterService из DI-контейнера
+            _characterService = Application.Current?.Handler?.MauiContext?.Services
+                .GetService<ICharacterService>();
+            Character = "永";
+
             InitializeCommands();
-            InitializeSampleData();
+
+            if (_characterService != null)
+            {
+                _ = LoadStrokeOrderDataAsync();
+            }
+            else
+            {
+                InitializeSampleData();
+            }
         }
 
         public StrokeOrderViewModel(ICharacterService characterService, string character)

@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Markup;
 using ChineseVocab.ViewModels;
 using ChineseVocab.Services;
 using ChineseVocab.Services.Audio;
+using ChineseVocab.Services.Character;
 
 namespace ChineseVocab
 {
@@ -59,6 +60,9 @@ namespace ChineseVocab
 
             // Регистрация сервиса аудио-озвучки (TextToSpeech)
             services.AddSingleton<ITextToSpeechService, TextToSpeechService>();
+
+            // Регистрация загрузчика данных порядка черт
+            services.AddSingleton<StrokeOrderDataLoader>();
         }
 
         private static void RegisterViewModels(IServiceCollection services)

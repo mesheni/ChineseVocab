@@ -14,15 +14,18 @@ namespace ChineseVocab.Services
     public class CharacterService : ICharacterService
     {
         private readonly IDatabaseService _databaseService;
+        private readonly Character.StrokeOrderDataLoader _strokeOrderLoader;
         private bool _isInitialized = false;
 
         /// <summary>
         /// Конструктор сервиса иероглифов.
         /// </summary>
         /// <param name="databaseService">Сервис базы данных для доступа к данным.</param>
-        public CharacterService(IDatabaseService databaseService)
+        /// <param name="strokeOrderLoader">Загрузчик данных порядка черт.</param>
+        public CharacterService(IDatabaseService databaseService, Character.StrokeOrderDataLoader strokeOrderLoader)
         {
             _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
+            _strokeOrderLoader = strokeOrderLoader ?? throw new ArgumentNullException(nameof(strokeOrderLoader));
         }
 
         #region Основные операции с иероглифами
@@ -242,42 +245,66 @@ namespace ChineseVocab.Services
         public async Task<StrokeOrderData> GetStrokeOrderAsync(string character)
         {
             await EnsureInitializedAsync();
-            var card = await GetCharacterBySymbolAsync(character);
-            int strokeCount = card?.StrokeCount ?? 3;
 
-            // Временная заглушка
+            if (string.IsNullOrEmpty(character))
+                return GetFallbackStrokeData(character, 0);
+
+            // Пробуем загрузить из JSON-данных
+            var data = await _strokeOrderLoader.GetStrokeOrderAsync(character);
+            if (data is not null)
+                return data;
+
+            // Если нет в JSON — генерируем заглушку на основе данных из БД
+            var card = await GetCharacterBySymbolAsync(character);
+            int strokeCount = card?.StrokeCount ?? GetEstimatedStrokeCount(character);
+            return GetFallbackStrokeData(character, strokeCount);
+        }
+
+        /// <summary>
+        /// Генерирует базовую заглушку данных порядка черт для иероглифа
+        /// на основе количества черт из БД.
+        /// </summary>
+        private static StrokeOrderData GetFallbackStrokeData(string character, int strokeCount)
+        {
+            if (strokeCount <= 0)
+                strokeCount = 3;
+
+            var strokes = new List<Stroke>();
+            float spacing = 300f / (strokeCount + 1);
+            for (int i = 0; i < strokeCount; i++)
+            {
+                float y = spacing * (i + 1);
+                strokes.Add(new Stroke
+                {
+                    Number = i + 1,
+                    Type = i % 2 == 0 ? "横" : "竖",
+                    Direction = i % 2 == 0 ? "left-to-right" : "top-to-bottom",
+                    Points = new List<Point>
+                    {
+                        new Point { X = 40, Y = (int)y },
+                        new Point { X = 260, Y = (int)y }
+                    }
+                });
+            }
+
             return new StrokeOrderData
             {
                 Character = character,
                 TotalStrokes = strokeCount,
-                Strokes = new List<Stroke>
-                {
-                    new Stroke
-                    {
-                        Number = 1,
-                        Type = "horizontal",
-                        Points = new List<Point>
-                        {
-                            new Point { X = 0, Y = 0 },
-                            new Point { X = 100, Y = 0 }
-                        },
-                        Direction = "left-to-right"
-                    },
-                    new Stroke
-                    {
-                        Number = 2,
-                        Type = "vertical",
-                        Points = new List<Point>
-                        {
-                            new Point { X = 50, Y = 0 },
-                            new Point { X = 50, Y = 100 }
-                        },
-                        Direction = "top-to-bottom"
-                    }
-                },
-                Rules = "Сначала горизонтальные, потом вертикальные черты",
-                CommonMistakes = "Неправильный порядок черт"
+                Strokes = strokes,
+                Rules = "Данные порядка черт для этого иероглифа недоступны. Показана примерная схема.",
+                CommonMistakes = "Рекомендуется изучить порядок черт из внешнего источника."
             };
+        }
+
+        /// <summary>
+        /// Оценивает количество черт по символу (эвристика).
+        /// </summary>
+        private static int GetEstimatedStrokeCount(string character)
+        {
+            if (string.IsNullOrEmpty(character))
+                return 3;
+            return character.Length == 1 ? 6 : character.Length * 5;
         }
 
         /// <summary>

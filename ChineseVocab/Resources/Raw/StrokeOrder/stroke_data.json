@@ -1,0 +1,310 @@
+{
+  "characters": [
+    {
+      "character": "一",
+      "totalStrokes": 1,
+      "rules": "Пишется слева направо, горизонтально.",
+      "commonMistakes": "Не наклонять черту.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 40, "y": 140 }, { "x": 260, "y": 140 } ] }
+      ]
+    },
+    {
+      "character": "二",
+      "totalStrokes": 2,
+      "rules": "Сверху вниз: сначала верхняя горизонтальная, затем нижняя (длиннее верхней).",
+      "commonMistakes": "Верхняя черта должна быть короче нижней.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 60, "y": 80 }, { "x": 230, "y": 80 } ] },
+        { "number": 2, "type": "横", "direction": "left-to-right", "points": [ { "x": 40, "y": 180 }, { "x": 260, "y": 180 } ] }
+      ]
+    },
+    {
+      "character": "三",
+      "totalStrokes": 3,
+      "rules": "Сверху вниз: три горизонтальные черты. Средняя — самая короткая, нижняя — самая длинная.",
+      "commonMistakes": "Средняя черта не должна быть длиннее нижней.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 70, "y": 60 }, { "x": 230, "y": 60 } ] },
+        { "number": 2, "type": "横", "direction": "left-to-right", "points": [ { "x": 95, "y": 140 }, { "x": 205, "y": 140 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 40, "y": 220 }, { "x": 260, "y": 220 } ] }
+      ]
+    },
+    {
+      "character": "十",
+      "totalStrokes": 2,
+      "rules": "Сначала горизонтальная, затем вертикальная (пересекает горизонтальную по центру).",
+      "commonMistakes": "Вертикальная черта не должна выходить далеко за горизонтальную снизу.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 60, "y": 140 }, { "x": 240, "y": 140 } ] },
+        { "number": 2, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 150, "y": 50 }, { "x": 150, "y": 230 } ] }
+      ]
+    },
+    {
+      "character": "人",
+      "totalStrokes": 2,
+      "rules": "Слева направо: сначала откидная влево, затем откидная вправо.",
+      "commonMistakes": "Правая черта не должна быть выше левой. Соблюдать симметрию.",
+      "strokes": [
+        { "number": 1, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 170, "y": 50 }, { "x": 100, "y": 50 }, { "x": 60, "y": 240 } ] },
+        { "number": 2, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 130, "y": 90 }, { "x": 210, "y": 160 }, { "x": 260, "y": 240 } ] }
+      ]
+    },
+    {
+      "character": "大",
+      "totalStrokes": 3,
+      "rules": "Горизонтальная → откидная влево → откидная вправо.",
+      "commonMistakes": "Горизонтальная черта должна быть выше центра. Правая и левая симметричны.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 70, "y": 100 }, { "x": 230, "y": 100 } ] },
+        { "number": 2, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 100 }, { "x": 100, "y": 120 }, { "x": 55, "y": 240 } ] },
+        { "number": 3, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 150, "y": 135 }, { "x": 210, "y": 190 }, { "x": 250, "y": 240 } ] }
+      ]
+    },
+    {
+      "character": "天",
+      "totalStrokes": 4,
+      "rules": "Горизонтальная → вторая горизонтальная (длиннее) → откидная влево → откидная вправо.",
+      "commonMistakes": "Первая горизонтальная короче второй. Нижние черты симметричны.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 70 }, { "x": 220, "y": 70 } ] },
+        { "number": 2, "type": "横", "direction": "left-to-right", "points": [ { "x": 60, "y": 125 }, { "x": 240, "y": 125 } ] },
+        { "number": 3, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 125 }, { "x": 100, "y": 140 }, { "x": 55, "y": 250 } ] },
+        { "number": 4, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 150, "y": 155 }, { "x": 210, "y": 200 }, { "x": 250, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "日",
+      "totalStrokes": 4,
+      "rules": "Внешний контур слева направо, сверху вниз: левая вертикальная → верхняя+правая (одной чертой с изломом) → внутренняя горизонтальная → нижняя горизонтальная (замыкает).",
+      "commonMistakes": "Нижняя черта замыкает контур последней.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 80, "y": 35 }, { "x": 80, "y": 235 } ] },
+        { "number": 2, "type": "横折", "direction": "left-to-right-then-down", "points": [ { "x": 80, "y": 35 }, { "x": 225, "y": 35 }, { "x": 225, "y": 235 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 135 }, { "x": 225, "y": 135 } ] },
+        { "number": 4, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 235 }, { "x": 225, "y": 235 } ] }
+      ]
+    },
+    {
+      "character": "月",
+      "totalStrokes": 4,
+      "rules": "Левая откидная-вертикальная → верхняя+правая (с изломом) → две внутренние горизонтальные.",
+      "commonMistakes": "Левая черта — не просто вертикальная, а откидная с лёгким изгибом.",
+      "strokes": [
+        { "number": 1, "type": "撇", "direction": "top-to-bottom-left", "points": [ { "x": 90, "y": 30 }, { "x": 70, "y": 130 }, { "x": 60, "y": 240 } ] },
+        { "number": 2, "type": "横折钩", "direction": "left-to-right-then-down-with-hook", "points": [ { "x": 60, "y": 30 }, { "x": 225, "y": 30 }, { "x": 225, "y": 240 }, { "x": 210, "y": 235 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 70, "y": 100 }, { "x": 220, "y": 100 } ] },
+        { "number": 4, "type": "横", "direction": "left-to-right", "points": [ { "x": 65, "y": 170 }, { "x": 220, "y": 170 } ] }
+      ]
+    },
+    {
+      "character": "水",
+      "totalStrokes": 4,
+      "rules": "Центральный вертикальный крюк → левая часть → верхняя правая откидная → нижняя правая откидная.",
+      "commonMistakes": "Центральный крюк пишется первым. Левая часть короче правой.",
+      "strokes": [
+        { "number": 1, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 150, "y": 25 }, { "x": 150, "y": 250 }, { "x": 140, "y": 245 } ] },
+        { "number": 2, "type": "横撇", "direction": "left-to-right-then-down-left", "points": [ { "x": 65, "y": 80 }, { "x": 150, "y": 80 }, { "x": 100, "y": 160 } ] },
+        { "number": 3, "type": "撇", "direction": "top-to-bottom-left", "points": [ { "x": 150, "y": 110 }, { "x": 210, "y": 110 }, { "x": 230, "y": 180 } ] },
+        { "number": 4, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 150, "y": 170 }, { "x": 200, "y": 200 }, { "x": 260, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "火",
+      "totalStrokes": 4,
+      "rules": "Левая точка → правая точка → центральная откидная → правая откидная.",
+      "commonMistakes": "Точки пишутся до центральных черт. Соблюдать симметрию.",
+      "strokes": [
+        { "number": 1, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 80, "y": 90 }, { "x": 90, "y": 120 } ] },
+        { "number": 2, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 220, "y": 80 }, { "x": 210, "y": 110 } ] },
+        { "number": 3, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 60 }, { "x": 110, "y": 140 }, { "x": 60, "y": 240 } ] },
+        { "number": 4, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 150, "y": 120 }, { "x": 200, "y": 180 }, { "x": 250, "y": 240 } ] }
+      ]
+    },
+    {
+      "character": "山",
+      "totalStrokes": 3,
+      "rules": "Центральная вертикальная → левая вертикальная (с изломом вниз) → правая вертикальная.",
+      "commonMistakes": "Центральная черта самая высокая. Левая и правая ниже.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 150, "y": 50 }, { "x": 150, "y": 230 } ] },
+        { "number": 2, "type": "竖折", "direction": "top-to-bottom-then-right", "points": [ { "x": 80, "y": 130 }, { "x": 80, "y": 230 }, { "x": 240, "y": 230 } ] },
+        { "number": 3, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 220, "y": 110 }, { "x": 220, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "口",
+      "totalStrokes": 3,
+      "rules": "Левая вертикальная → верхняя+правая (излом) → нижняя горизонтальная (замыкает).",
+      "commonMistakes": "Нижняя черта замыкает контур последней. Форма — квадрат.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 90, "y": 50 }, { "x": 90, "y": 215 } ] },
+        { "number": 2, "type": "横折", "direction": "left-to-right-then-down", "points": [ { "x": 90, "y": 50 }, { "x": 220, "y": 50 }, { "x": 220, "y": 215 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 90, "y": 215 }, { "x": 220, "y": 215 } ] }
+      ]
+    },
+    {
+      "character": "女",
+      "totalStrokes": 3,
+      "rules": "Откидная-точка (как одна черта с изломом) → откидная влево → горизонтальная.",
+      "commonMistakes": "Первая черта сложная: начинается как откидная влево, затем переходит в точку-откидную вправо.",
+      "strokes": [
+        { "number": 1, "type": "撇点", "direction": "down-left-then-down-right", "points": [ { "x": 170, "y": 30 }, { "x": 100, "y": 120 }, { "x": 170, "y": 160 } ] },
+        { "number": 2, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 170, "y": 160 }, { "x": 100, "y": 160 }, { "x": 60, "y": 230 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 50, "y": 120 }, { "x": 230, "y": 120 } ] }
+      ]
+    },
+    {
+      "character": "子",
+      "totalStrokes": 3,
+      "rules": "Горизонтальная с крюком влево → вертикальный крюк → горизонтальная.",
+      "commonMistakes": "Вторая черта (вертикальный крюк) — самая длинная.",
+      "strokes": [
+        { "number": 1, "type": "横钩", "direction": "left-to-right-then-hook-left", "points": [ { "x": 60, "y": 70 }, { "x": 200, "y": 70 }, { "x": 185, "y": 60 } ] },
+        { "number": 2, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 180, "y": 95 }, { "x": 180, "y": 250 }, { "x": 168, "y": 240 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 70, "y": 170 }, { "x": 240, "y": 170 } ] }
+      ]
+    },
+    {
+      "character": "好",
+      "totalStrokes": 6,
+      "rules": "Левая часть (女): как отдельный иероглиф. Правая часть (子): горизонтальная с крюком → вертикальный крюк → горизонтальная.",
+      "commonMistakes": "Левая часть ýже правой. Соблюдать баланс.",
+      "strokes": [
+        { "number": 1, "type": "撇点", "direction": "down-left-then-down-right", "points": [ { "x": 110, "y": 25 }, { "x": 60, "y": 100 }, { "x": 110, "y": 130 } ] },
+        { "number": 2, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 110, "y": 130 }, { "x": 70, "y": 130 }, { "x": 35, "y": 200 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 25, "y": 100 }, { "x": 150, "y": 100 } ] },
+        { "number": 4, "type": "横钩", "direction": "left-to-right-then-hook-left", "points": [ { "x": 145, "y": 55 }, { "x": 255, "y": 55 }, { "x": 242, "y": 45 } ] },
+        { "number": 5, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 240, "y": 75 }, { "x": 240, "y": 230 }, { "x": 230, "y": 222 } ] },
+        { "number": 6, "type": "横", "direction": "left-to-right", "points": [ { "x": 155, "y": 155 }, { "x": 275, "y": 155 } ] }
+      ]
+    },
+    {
+      "character": "中",
+      "totalStrokes": 4,
+      "rules": "Вертикальная → левая+нижняя+правая (одна черта с двумя изломами) → вертикальная (через центр).",
+      "commonMistakes": "Центральная вертикальная (последняя) должна проходить точно по центру.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 90, "y": 90 }, { "x": 90, "y": 180 } ] },
+        { "number": 2, "type": "横折横", "direction": "right-down-left", "points": [ { "x": 90, "y": 90 }, { "x": 220, "y": 90 }, { "x": 220, "y": 180 }, { "x": 90, "y": 180 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 90, "y": 135 }, { "x": 220, "y": 135 } ] },
+        { "number": 4, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 155, "y": 40 }, { "x": 155, "y": 230 } ] }
+      ]
+    },
+    {
+      "character": "国",
+      "totalStrokes": 8,
+      "rules": "Внешний контур: левая вертикальная → верхняя+правая (излом) → внутреннее 玉 (горизонтальная → горизонтальная → вертикальная → горизонтальная) → нижняя замыкающая.",
+      "commonMistakes": "Нижняя черта контура замыкается самой последней.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 60, "y": 25 }, { "x": 60, "y": 250 } ] },
+        { "number": 2, "type": "横折", "direction": "left-to-right-then-down", "points": [ { "x": 60, "y": 25 }, { "x": 245, "y": 25 }, { "x": 245, "y": 250 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 75, "y": 80 }, { "x": 230, "y": 80 } ] },
+        { "number": 4, "type": "横", "direction": "left-to-right", "points": [ { "x": 75, "y": 135 }, { "x": 230, "y": 135 } ] },
+        { "number": 5, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 155, "y": 80 }, { "x": 155, "y": 200 } ] },
+        { "number": 6, "type": "横", "direction": "left-to-right", "points": [ { "x": 75, "y": 200 }, { "x": 230, "y": 200 } ] },
+        { "number": 7, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 190, "y": 200 }, { "x": 200, "y": 225 } ] },
+        { "number": 8, "type": "横", "direction": "left-to-right", "points": [ { "x": 60, "y": 250 }, { "x": 245, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "我",
+      "totalStrokes": 7,
+      "rules": "Откидная влево → горизонтальная → вертикальный крюк → поднимающаяся → откидная → точка → откидная вправо.",
+      "commonMistakes": "Сложный иероглиф. Соблюдать последовательность и пропорции.",
+      "strokes": [
+        { "number": 1, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 25 }, { "x": 100, "y": 30 }, { "x": 50, "y": 140 } ] },
+        { "number": 2, "type": "横", "direction": "left-to-right", "points": [ { "x": 60, "y": 90 }, { "x": 220, "y": 90 } ] },
+        { "number": 3, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 150, "y": 130 }, { "x": 150, "y": 250 }, { "x": 138, "y": 240 } ] },
+        { "number": 4, "type": "提", "direction": "bottom-left-to-top-right", "points": [ { "x": 80, "y": 180 }, { "x": 145, "y": 140 } ] },
+        { "number": 5, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 190, "y": 110 }, { "x": 160, "y": 130 }, { "x": 120, "y": 200 } ] },
+        { "number": 6, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 220, "y": 90 }, { "x": 225, "y": 115 } ] },
+        { "number": 7, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 170, "y": 170 }, { "x": 220, "y": 200 }, { "x": 260, "y": 240 } ] }
+      ]
+    },
+    {
+      "character": "不",
+      "totalStrokes": 4,
+      "rules": "Горизонтальная → откидная влево → вертикальная → откидная вправо (точка).",
+      "commonMistakes": "Вертикальная черта проходит через центр. Правая точка не выходит за горизонтальную.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 70, "y": 80 }, { "x": 230, "y": 80 } ] },
+        { "number": 2, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 80 }, { "x": 100, "y": 120 }, { "x": 70, "y": 230 } ] },
+        { "number": 3, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 130, "y": 120 }, { "x": 130, "y": 230 } ] },
+        { "number": 4, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 200, "y": 140 }, { "x": 210, "y": 180 } ] }
+      ]
+    },
+    {
+      "character": "了",
+      "totalStrokes": 2,
+      "rules": "Горизонтальная с крюком → вертикальный крюк.",
+      "commonMistakes": "Первая черта: горизонтальная переходит в крюк влево-вниз.",
+      "strokes": [
+        { "number": 1, "type": "横钩", "direction": "left-to-right-then-hook-down-left", "points": [ { "x": 70, "y": 80 }, { "x": 210, "y": 80 }, { "x": 185, "y": 60 } ] },
+        { "number": 2, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 180, "y": 100 }, { "x": 180, "y": 255 }, { "x": 165, "y": 245 } ] }
+      ]
+    },
+    {
+      "character": "是",
+      "totalStrokes": 9,
+      "rules": "Верхняя часть (日): вертикальная → излом → внутренняя горизонтальная → нижняя замыкающая. Нижняя часть: горизонтальная → вертикальная → горизонтальная → откидная влево → откидная вправо.",
+      "commonMistakes": "Верхняя часть компактная. Нижняя шире верхней.",
+      "strokes": [
+        { "number": 1, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 100, "y": 25 }, { "x": 100, "y": 95 } ] },
+        { "number": 2, "type": "横折", "direction": "left-to-right-then-down", "points": [ { "x": 100, "y": 25 }, { "x": 210, "y": 25 }, { "x": 210, "y": 95 } ] },
+        { "number": 3, "type": "横", "direction": "left-to-right", "points": [ { "x": 100, "y": 60 }, { "x": 210, "y": 60 } ] },
+        { "number": 4, "type": "横", "direction": "left-to-right", "points": [ { "x": 100, "y": 95 }, { "x": 210, "y": 95 } ] },
+        { "number": 5, "type": "横", "direction": "left-to-right", "points": [ { "x": 50, "y": 130 }, { "x": 250, "y": 130 } ] },
+        { "number": 6, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 130, "y": 130 }, { "x": 130, "y": 190 } ] },
+        { "number": 7, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 160 }, { "x": 220, "y": 160 } ] },
+        { "number": 8, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 150, "y": 190 }, { "x": 100, "y": 210 }, { "x": 60, "y": 250 } ] },
+        { "number": 9, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 150, "y": 200 }, { "x": 210, "y": 230 }, { "x": 260, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "有",
+      "totalStrokes": 6,
+      "rules": "Горизонтальная → откидная влево → вертикальная → горизонтальная+излом → внутренние горизонтальные.",
+      "commonMistakes": "Первая откидная пересекает горизонтальную.",
+      "strokes": [
+        { "number": 1, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 60 }, { "x": 220, "y": 60 } ] },
+        { "number": 2, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 70, "y": 60 }, { "x": 60, "y": 100 }, { "x": 40, "y": 220 } ] },
+        { "number": 3, "type": "竖", "direction": "top-to-bottom", "points": [ { "x": 160, "y": 75 }, { "x": 160, "y": 220 } ] },
+        { "number": 4, "type": "横折", "direction": "left-to-right-then-down", "points": [ { "x": 110, "y": 120 }, { "x": 220, "y": 120 }, { "x": 220, "y": 220 } ] },
+        { "number": 5, "type": "横", "direction": "left-to-right", "points": [ { "x": 110, "y": 150 }, { "x": 220, "y": 150 } ] },
+        { "number": 6, "type": "横", "direction": "left-to-right", "points": [ { "x": 110, "y": 185 }, { "x": 220, "y": 185 } ] }
+      ]
+    },
+    {
+      "character": "这",
+      "totalStrokes": 7,
+      "rules": "Левая верхняя часть (文): точка → горизонтальная → откидная → откидная. Правая нижняя (辶): точка → излом → откидная вправо.",
+      "commonMistakes": "Элемент 辶 (движение) пишется последним.",
+      "strokes": [
+        { "number": 1, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 120, "y": 25 }, { "x": 130, "y": 50 } ] },
+        { "number": 2, "type": "横", "direction": "left-to-right", "points": [ { "x": 95, "y": 55 }, { "x": 155, "y": 55 } ] },
+        { "number": 3, "type": "撇", "direction": "top-right-to-bottom-left", "points": [ { "x": 130, "y": 55 }, { "x": 100, "y": 70 }, { "x": 70, "y": 140 } ] },
+        { "number": 4, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 130, "y": 55 }, { "x": 180, "y": 100 }, { "x": 210, "y": 140 } ] },
+        { "number": 5, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 70, "y": 170 }, { "x": 80, "y": 195 } ] },
+        { "number": 6, "type": "横折捺", "direction": "right-down-right", "points": [ { "x": 85, "y": 200 }, { "x": 125, "y": 200 }, { "x": 105, "y": 230 } ] },
+        { "number": 7, "type": "捺", "direction": "top-left-to-bottom-right", "points": [ { "x": 105, "y": 230 }, { "x": 180, "y": 220 }, { "x": 260, "y": 250 } ] }
+      ]
+    },
+    {
+      "character": "学",
+      "totalStrokes": 8,
+      "rules": "Верх: точки → откидные. Центр: крышка. Низ: 子 (горизонтальная с крюком → вертикальный крюк → горизонтальная).",
+      "commonMistakes": "Верхняя часть (точки и откидные) симметрична. Низ как отдельный 子.",
+      "strokes": [
+        { "number": 1, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 100, "y": 25 }, { "x": 105, "y": 45 } ] },
+        { "number": 2, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 155, "y": 20 }, { "x": 155, "y": 40 } ] },
+        { "number": 3, "type": "撇", "direction": "top-to-bottom-left", "points": [ { "x": 200, "y": 25 }, { "x": 180, "y": 40 }, { "x": 140, "y": 70 } ] },
+        { "number": 4, "type": "点", "direction": "top-to-bottom", "points": [ { "x": 150, "y": 65 }, { "x": 155, "y": 80 } ] },
+        { "number": 5, "type": "横钩", "direction": "left-to-right-then-hook-left", "points": [ { "x": 55, "y": 100 }, { "x": 250, "y": 100 }, { "x": 235, "y": 88 } ] },
+        { "number": 6, "type": "横钩", "direction": "left-to-right-then-hook-left", "points": [ { "x": 70, "y": 130 }, { "x": 210, "y": 130 }, { "x": 195, "y": 120 } ] },
+        { "number": 7, "type": "竖钩", "direction": "top-to-bottom-with-hook", "points": [ { "x": 185, "y": 155 }, { "x": 185, "y": 255 }, { "x": 173, "y": 245 } ] },
+        { "number": 8, "type": "横", "direction": "left-to-right", "points": [ { "x": 80, "y": 200 }, { "x": 250, "y": 200 } ] }
+      ]
+    }
+  ]
+}
