@@ -18,8 +18,10 @@
     </ContentPage.BindingContext>
 
     <Grid RowDefinitions="Auto,*,Auto,Auto"
-          Padding="20"
-          RowSpacing="20">
+          Padding="{OnIdiom Phone=16, Tablet=24, Desktop=32}"
+          RowSpacing="{OnIdiom Phone=12, Tablet=20, Desktop=24}"
+          MaximumWidthRequest="800"
+          HorizontalOptions="Center">
 
         <!-- Заголовок и прогресс -->
         <Frame Grid.Row="0"
@@ -43,7 +45,7 @@
                 <!-- Выбор режима изучения -->
                 <VerticalStackLayout Spacing="5">
                     <Label Text="Режим изучения:"
-                           FontSize="14"
+                           FontSize="{OnIdiom Phone=13, Tablet=14, Desktop=16}"
                            HorizontalOptions="Center"
                            TextColor="{StaticResource Secondary}"/>
 
@@ -57,13 +59,22 @@
                                CornerRadius="8"
                                BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=New}"
                                HasShadow="True">
-                            <Button Text="Новые"
-                                    Command="{Binding ChangeStudyModeCommand}"
-                                    CommandParameter="New"
-                                    BackgroundColor="Transparent"
-                                    TextColor="White"
-                                    FontSize="12"
-                                    HeightRequest="40"/>
+                            <VerticalStackLayout Spacing="2"
+                                                 HorizontalOptions="Center"
+                                                 VerticalOptions="Center">
+                                <Button Text="Новые"
+                                        Command="{Binding ChangeStudyModeCommand}"
+                                        CommandParameter="New"
+                                        BackgroundColor="Transparent"
+                                        TextColor="White"
+                                        FontSize="{OnIdiom Phone=11, Tablet=12, Desktop=14}"
+                                        HeightRequest="40"
+                                        Padding="0"/>
+                                <Label Text="{Binding AvailableNewCardsCount, StringFormat='({0})'}"
+                                       FontSize="{OnIdiom Phone=10, Tablet=11, Desktop=12}"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
                         </Frame>
 
                         <!-- Повторение -->
@@ -72,13 +83,22 @@
                                CornerRadius="8"
                                BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=Review}"
                                HasShadow="True">
-                            <Button Text="Повторение"
-                                    Command="{Binding ChangeStudyModeCommand}"
-                                    CommandParameter="Review"
-                                    BackgroundColor="Transparent"
-                                    TextColor="White"
-                                    FontSize="12"
-                                    HeightRequest="40"/>
+                            <VerticalStackLayout Spacing="2"
+                                                 HorizontalOptions="Center"
+                                                 VerticalOptions="Center">
+                                <Button Text="Повторение"
+                                        Command="{Binding ChangeStudyModeCommand}"
+                                        CommandParameter="Review"
+                                        BackgroundColor="Transparent"
+                                        TextColor="White"
+                                        FontSize="{OnIdiom Phone=11, Tablet=12, Desktop=14}"
+                                        HeightRequest="40"
+                                        Padding="0"/>
+                                <Label Text="{Binding AvailableReviewCardsCount, StringFormat='({0})'}"
+                                       FontSize="{OnIdiom Phone=10, Tablet=11, Desktop=12}"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
                         </Frame>
 
                         <!-- Смешанный -->
@@ -87,18 +107,27 @@
                                CornerRadius="8"
                                BackgroundColor="{Binding CurrentStudyMode, Converter={StaticResource StudyModeToColorConverter}, ConverterParameter=Mixed}"
                                HasShadow="True">
-                            <Button Text="Смешанный"
-                                    Command="{Binding ChangeStudyModeCommand}"
-                                    CommandParameter="Mixed"
-                                    BackgroundColor="Transparent"
-                                    TextColor="White"
-                                    FontSize="12"
-                                    HeightRequest="40"/>
+                            <VerticalStackLayout Spacing="2"
+                                                 HorizontalOptions="Center"
+                                                 VerticalOptions="Center">
+                                <Button Text="Смешанный"
+                                        Command="{Binding ChangeStudyModeCommand}"
+                                        CommandParameter="Mixed"
+                                        BackgroundColor="Transparent"
+                                        TextColor="White"
+                                        FontSize="{OnIdiom Phone=11, Tablet=12, Desktop=14}"
+                                        HeightRequest="40"
+                                        Padding="0"/>
+                                <Label Text="{Binding TotalAvailableCardsCount, StringFormat='({0})'}"
+                                       FontSize="{OnIdiom Phone=10, Tablet=11, Desktop=12}"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
                         </Frame>
                     </Grid>
 
                     <Label Text="{Binding CurrentStudyModeDescription}"
-                           FontSize="12"
+                           FontSize="{OnIdiom Phone=11, Tablet=12, Desktop=14}"
                            HorizontalOptions="Center"
                            TextColor="{StaticResource Secondary}"/>
                 </VerticalStackLayout>
@@ -108,38 +137,39 @@
         <!-- Основная область карточки -->
         <Frame x:Name="CardFrame"
                Grid.Row="1"
-               Padding="30"
+               Padding="{OnIdiom Phone=20, Tablet=30, Desktop=40}"
                CornerRadius="15"
                BackgroundColor="{StaticResource Surface}"
                HasShadow="True"
                HorizontalOptions="Center"
-               VerticalOptions="Center">
+               VerticalOptions="Center"
+               MaximumWidthRequest="500">
 
-            <VerticalStackLayout Spacing="25"
+            <VerticalStackLayout Spacing="{OnIdiom Phone=15, Tablet=25, Desktop=30}"
                                  HorizontalOptions="Center"
                                  VerticalOptions="Center">
 
                 <!-- Иероглиф -->
                 <Label Text="{Binding CurrentCard.Character}"
-                       FontSize="64"
+                       FontSize="{OnIdiom Phone=40, Tablet=64, Desktop=72}"
                        FontFamily="Microsoft YaHei"
                        HorizontalOptions="Center"
                        HorizontalTextAlignment="Center"
                        VerticalOptions="Center"/>
 
                 <!-- Если показан ответ, отображаем пиньинь и перевод -->
-                <VerticalStackLayout Spacing="15"
+                <VerticalStackLayout Spacing="{OnIdiom Phone=10, Tablet=15, Desktop=20}"
                                      IsVisible="{Binding IsAnswerVisible}">
 
                     <!-- Пиньинь -->
                     <Label Text="{Binding CurrentCard.Pinyin}"
-                           FontSize="24"
+                           FontSize="{OnIdiom Phone=18, Tablet=24, Desktop=28}"
                            HorizontalOptions="Center"
                            TextColor="{StaticResource Primary}"/>
 
                     <!-- Перевод -->
                     <Label Text="{Binding CurrentCard.Definition}"
-                           FontSize="18"
+                           FontSize="{OnIdiom Phone=14, Tablet=18, Desktop=22}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center"
                            LineBreakMode="WordWrap"
@@ -149,11 +179,11 @@
                     <VerticalStackLayout Spacing="5"
                                          IsVisible="{Binding HasExamples}">
                         <Label Text="Примеры:"
-                               FontSize="14"
+                               FontSize="{OnIdiom Phone=12, Tablet=14, Desktop=16}"
                                FontAttributes="Bold"
                                TextColor="{StaticResource Secondary}"/>
                         <Label Text="{Binding ExamplesText}"
-                               FontSize="14"
+                               FontSize="{OnIdiom Phone=12, Tablet=14, Desktop=16}"
                                HorizontalOptions="Center"
                                HorizontalTextAlignment="Center"
                                LineBreakMode="WordWrap"
@@ -168,7 +198,8 @@
                         BackgroundColor="{StaticResource Primary}"
                         TextColor="White"
                         CornerRadius="10"
-                        HeightRequest="50"
+                        HeightRequest="{OnIdiom Phone=44, Tablet=50, Desktop=56}"
+                        FontSize="{OnIdiom Phone=14, Tablet=16, Desktop=18}"
                         Margin="0,20,0,0"/>
             </VerticalStackLayout>
         </Frame>
@@ -283,7 +314,7 @@
             </Grid>
 
             <Label Text="0: Полный провал, 1: Не знаю, 2: Почти, 3: Средне, 4: Хорошо, 5: Отлично"
-                   FontSize="12"
+                   FontSize="{OnIdiom Phone=10, Tablet=12, Desktop=14}"
                    HorizontalOptions="Center"
                    TextColor="{StaticResource Secondary}"/>
         </VerticalStackLayout>

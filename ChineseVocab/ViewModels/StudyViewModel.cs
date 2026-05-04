@@ -34,6 +34,17 @@ namespace ChineseVocab.ViewModels
         private int _totalCardsInSession = 10; // Временное значение для демонстрации
 
         /// <summary>
+        /// Полный список всех карточек (нефильтрованный).
+        /// </summary>
+        private List<Card> _allCards = new List<Card>();
+
+        /// <summary>
+        /// Множество идентификаторов изученных карточек (по символу).
+        /// Имитирует отслеживание повторений из БД.
+        /// </summary>
+        private readonly HashSet<string> _studiedCardChars = new HashSet<string>();
+
+        /// <summary>
         /// Текущая карточка, отображаемая пользователю.
         /// </summary>
         [ObservableProperty]
@@ -76,6 +87,24 @@ namespace ChineseVocab.ViewModels
         private ObservableCollection<Card> _cards = new ObservableCollection<Card>();
 
         /// <summary>
+        /// Количество новых (неизученных) карточек в текущем режиме.
+        /// </summary>
+        [ObservableProperty]
+        private int _availableNewCardsCount = 0;
+
+        /// <summary>
+        /// Количество карточек для повторения в текущем режиме.
+        /// </summary>
+        [ObservableProperty]
+        private int _availableReviewCardsCount = 0;
+
+        /// <summary>
+        /// Общее количество доступных карточек (без фильтрации).
+        /// </summary>
+        [ObservableProperty]
+        private int _totalAvailableCardsCount = 0;
+
+        /// <summary>
         /// Конструктор ViewModel.
         /// </summary>
         public StudyViewModel()
@@ -83,6 +112,9 @@ namespace ChineseVocab.ViewModels
             Title = "Изучение карточек";
             // Инициализируем тестовые данные
             InitializeTestCards();
+            // Применяем режим по умолчанию (Mixed) — загружаем все карточки
+            RebuildCardListForMode(CurrentStudyMode);
+            _currentCardIndex = 0;
             LoadNextCard();
         }
 
@@ -136,6 +168,12 @@ namespace ChineseVocab.ViewModels
 
                 Console.WriteLine($"Card rated: {CurrentCard.Character}, Rating: {rating}");
                 Console.WriteLine($"SRS: interval={newInterval} days, repetitions={newRepetitionCount}, E-Factor={newEFactor:F2}");
+
+                // Помечаем карточку как изученную (для отслеживания в режимах New/Review)
+                if (!string.IsNullOrEmpty(CurrentCard?.Character))
+                {
+                    _studiedCardChars.Add(CurrentCard.Character);
+                }
 
                 // Обновляем статистику
                 _totalCardsStudied++;
@@ -243,30 +281,84 @@ namespace ChineseVocab.ViewModels
         /// </summary>
         private void InitializeTestCards()
         {
-            Cards.Clear();
+            _allCards.Clear();
 
             // Добавляем тестовые карточки (базовые иероглифы HSK 1)
-            Cards.Add(new Card("人", "rén", "человек", 1) { StrokeCount = 2, Radical = "人" });
-            Cards.Add(new Card("好", "hǎo", "хороший", 1) { StrokeCount = 6, Radical = "女" });
-            Cards.Add(new Card("学", "xué", "учиться", 1) { StrokeCount = 8, Radical = "子" });
-            Cards.Add(new Card("中", "zhōng", "середина, Китай", 1) { StrokeCount = 4, Radical = "丨" });
-            Cards.Add(new Card("国", "guó", "страна", 1) { StrokeCount = 8, Radical = "囗" });
-            Cards.Add(new Card("大", "dà", "большой", 1) { StrokeCount = 3, Radical = "大" });
-            Cards.Add(new Card("小", "xiǎo", "маленький", 1) { StrokeCount = 3, Radical = "小" });
-            Cards.Add(new Card("上", "shàng", "верх, на", 1) { StrokeCount = 3, Radical = "一" });
-            Cards.Add(new Card("下", "xià", "низ, под", 1) { StrokeCount = 3, Radical = "一" });
-            Cards.Add(new Card("我", "wǒ", "я", 1) { StrokeCount = 7, Radical = "戈" });
+            _allCards.Add(new Card("人", "rén", "человек", 1) { StrokeCount = 2, Radical = "人" });
+            _allCards.Add(new Card("好", "hǎo", "хороший", 1) { StrokeCount = 6, Radical = "女" });
+            _allCards.Add(new Card("学", "xué", "учиться", 1) { StrokeCount = 8, Radical = "子" });
+            _allCards.Add(new Card("中", "zhōng", "середина, Китай", 1) { StrokeCount = 4, Radical = "丨" });
+            _allCards.Add(new Card("国", "guó", "страна", 1) { StrokeCount = 8, Radical = "囗" });
+            _allCards.Add(new Card("大", "dà", "большой", 1) { StrokeCount = 3, Radical = "大" });
+            _allCards.Add(new Card("小", "xiǎo", "маленький", 1) { StrokeCount = 3, Radical = "小" });
+            _allCards.Add(new Card("上", "shàng", "верх, на", 1) { StrokeCount = 3, Radical = "一" });
+            _allCards.Add(new Card("下", "xià", "низ, под", 1) { StrokeCount = 3, Radical = "一" });
+            _allCards.Add(new Card("我", "wǒ", "я", 1) { StrokeCount = 7, Radical = "戈" });
 
-            // Перемешиваем карточки для разнообразия
-            var shuffled = Cards.OrderBy(x => _random.Next()).ToList();
+            // Перемешиваем полный список
+            _allCards = _allCards.OrderBy(x => _random.Next()).ToList();
+
+            // Обновляем счётчики доступных карточек
+            UpdateAvailableCounts();
+        }
+
+        /// <summary>
+        /// Перестраивает коллекцию Cards в соответствии с выбранным режимом изучения.
+        /// </summary>
+        /// <param name="mode">Режим изучения (New, Review, Mixed).</param>
+        private void RebuildCardListForMode(StudyMode mode)
+        {
+            List<Card> filtered;
+
+            switch (mode)
+            {
+                case StudyMode.New:
+                    // Новые карточки — те, которых нет в _studiedCardChars
+                    filtered = _allCards
+                        .Where(c => !_studiedCardChars.Contains(c.Character))
+                        .ToList();
+                    break;
+
+                case StudyMode.Review:
+                    // Карточки для повторения — те, которые уже были изучены
+                    filtered = _allCards
+                        .Where(c => _studiedCardChars.Contains(c.Character))
+                        .ToList();
+                    break;
+
+                case StudyMode.Mixed:
+                default:
+                    // Смешанный режим — все карточки
+                    filtered = _allCards.ToList();
+                    break;
+            }
+
+            // Перемешиваем отфильтрованный список для разнообразия
+            filtered = filtered.OrderBy(x => _random.Next()).ToList();
+
             Cards.Clear();
-            foreach (var card in shuffled)
+            foreach (var card in filtered)
             {
                 Cards.Add(card);
             }
 
+            // Сбрасываем прогресс сессии
+            _totalCardsStudied = 0;
             _totalCardsInSession = Cards.Count;
+            _currentCardIndex = 0;
+
             UpdateProgress();
+            UpdateAvailableCounts();
+        }
+
+        /// <summary>
+        /// Обновляет счётчики доступных карточек для каждого режима.
+        /// </summary>
+        private void UpdateAvailableCounts()
+        {
+            TotalAvailableCardsCount = _allCards.Count;
+            AvailableNewCardsCount = _allCards.Count(c => !_studiedCardChars.Contains(c.Character));
+            AvailableReviewCardsCount = _allCards.Count(c => _studiedCardChars.Contains(c.Character));
         }
 
         /// <summary>
@@ -388,20 +480,50 @@ namespace ChineseVocab.ViewModels
 
         /// <summary>
         /// Команда для изменения режима изучения.
+        /// Перестраивает колоду карточек в соответствии с выбранным режимом.
         /// </summary>
         [RelayCommand]
-        private void ChangeStudyMode(string modeString)
+        private async Task ChangeStudyMode(string modeString)
         {
-            if (Enum.TryParse<StudyMode>(modeString, true, out var mode))
+            if (!Enum.TryParse<StudyMode>(modeString, true, out var mode))
             {
-                CurrentStudyMode = mode;
-                // В будущем здесь будет перезагрузка карточек в соответствии с режимом
-                Console.WriteLine($"Study mode changed to: {mode}");
+                Console.WriteLine($"Invalid study mode: {modeString}");
+                return;
+            }
+
+            // Если режим не изменился — ничего не делаем
+            if (mode == CurrentStudyMode)
+                return;
+
+            CurrentStudyMode = mode;
+
+            // Сбрасываем видимость ответа перед сменой режима
+            IsAnswerVisible = false;
+            HasExamples = false;
+            ExamplesText = string.Empty;
+
+            // Перестраиваем колоду под новый режим
+            await Task.Delay(150); // Небольшая задержка для плавности UI
+            RebuildCardListForMode(mode);
+
+            // Загружаем первую карточку из новой колоды
+            if (Cards.Count > 0)
+            {
+                _currentCardIndex = 0;
+                CurrentCard = Cards[0];
             }
             else
             {
-                Console.WriteLine($"Invalid study mode: {modeString}");
+                // Если в выбранном режиме нет карточек — показываем заглушку
+                CurrentCard = new Card(mode == StudyMode.New ? "✓" : "—",
+                    mode == StudyMode.New ? "Все карточки изучены!" : "Нет карточек для повторения",
+                    mode == StudyMode.New
+                        ? "Переключитесь на режим повторения или смешанный."
+                        : "Изучите новые карточки, затем возвращайтесь.",
+                    0);
             }
+
+            Console.WriteLine($"Study mode changed to: {mode}, cards in session: {Cards.Count}");
         }
 
         partial void OnCurrentStudyModeChanged(StudyMode value)
