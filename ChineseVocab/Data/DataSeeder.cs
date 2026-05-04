@@ -86,7 +86,7 @@ namespace ChineseVocab.Services
                     characterType.ModifiedDate = DateTime.UtcNow;
                     characterType.IsSystem = true; // Системные типы нельзя удалять
 
-                    await _database.InsertAsync(characterType);
+                    await _databaseService.CreateCharacterTypeAsync(characterType);
                 }
 
                 Console.WriteLine($"Загружено {defaultTypes.Count} типов иероглифов.");

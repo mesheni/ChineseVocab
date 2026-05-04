@@ -19,6 +19,13 @@ namespace ChineseVocab.Services
         private bool _isInitialized = false;
 
         /// <summary>
+        /// Безопасный доступ к соединению с базой данных.
+        /// Выбрасывает исключение, если база данных не инициализирована.
+        /// </summary>
+        private SQLiteAsyncConnection Database =>
+            _database ?? throw new InvalidOperationException("База данных не инициализирована. Вызовите InitializeDatabaseAsync().");
+
+        /// <summary>
         /// Конструктор сервиса базы данных.
         /// </summary>
         public DatabaseService()
@@ -78,7 +85,7 @@ namespace ChineseVocab.Services
         {
             if (_database != null)
             {
-                await _database.CloseAsync();
+                await Database.CloseAsync();
                 _database = null;
                 _isInitialized = false;
             }
@@ -185,7 +192,7 @@ namespace ChineseVocab.Services
         public async Task<Card> GetCardByIdAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.Id == id).FirstOrDefaultAsync();
+            return await Database.Table<Card>().Where(c => c.Id == id).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -194,7 +201,7 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetAllCardsAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.IsActive).ToListAsync();
+            return await Database.Table<Card>().Where(c => c.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -203,7 +210,7 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsByHskLevelAsync(int hskLevel)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.HskLevel == hskLevel && c.IsActive).ToListAsync();
+            return await Database.Table<Card>().Where(c => c.HskLevel == hskLevel && c.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -212,7 +219,7 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsByRadicalAsync(string radical)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.Radical == radical && c.IsActive).ToListAsync();
+            return await Database.Table<Card>().Where(c => c.Radical == radical && c.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -221,7 +228,7 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsByCharacterTypeAsync(string characterType)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.CharacterType == characterType && c.IsActive).ToListAsync();
+            return await Database.Table<Card>().Where(c => c.CharacterType == characterType && c.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -230,8 +237,14 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsForReviewAsync()
         {
             await EnsureInitializedAsync();
-            // Временная заглушка - возвращаем все активные карточки
-            return await _database.Table<Card>().Where(c => c.IsActive).Take(10).ToListAsync();
+            var today = DateTime.UtcNow.Date;
+            return await Database.QueryAsync<Card>(
+                @"SELECT c.* FROM Cards c
+                  INNER JOIN SRSStatistics s ON c.Id = s.CardId
+                  WHERE c.IsActive = 1
+                    AND s.NextReviewDate <= ?
+                  ORDER BY s.NextReviewDate ASC",
+                today);
         }
 
         /// <summary>
@@ -240,8 +253,13 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsByDeckIdAsync(int deckId)
         {
             await EnsureInitializedAsync();
-            // Временная заглушка - возвращаем все активные карточки
-            return await _database.Table<Card>().Where(c => c.IsActive).Take(20).ToListAsync();
+            return await Database.QueryAsync<Card>(
+                @"SELECT c.* FROM Cards c
+                  INNER JOIN CardDeck cd ON c.Id = cd.CardId
+                  WHERE cd.DeckId = ?
+                    AND c.IsActive = 1
+                  ORDER BY cd.AddedDate DESC",
+                deckId);
         }
 
         /// <summary>
@@ -250,7 +268,7 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetCardsByTagsAsync(string tags)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.Tags.Contains(tags) && c.IsActive).ToListAsync();
+            return await Database.Table<Card>().Where(c => c.Tags.Contains(tags) && c.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -260,7 +278,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             searchText = searchText.ToLower();
-            return await _database.Table<Card>()
+            return await Database.Table<Card>()
                 .Where(c => c.IsActive &&
                     (c.Character.ToLower().Contains(searchText) ||
                      c.Pinyin.ToLower().Contains(searchText) ||
@@ -276,7 +294,7 @@ namespace ChineseVocab.Services
             await EnsureInitializedAsync();
             card.CreatedDate = DateTime.UtcNow;
             card.ModifiedDate = DateTime.UtcNow;
-            return await _database.InsertAsync(card);
+            return await Database.InsertAsync(card);
         }
 
         /// <summary>
@@ -286,7 +304,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             card.ModifiedDate = DateTime.UtcNow;
-            return await _database.UpdateAsync(card);
+            return await Database.UpdateAsync(card);
         }
 
         /// <summary>
@@ -311,7 +329,7 @@ namespace ChineseVocab.Services
         public async Task<int> HardDeleteCardAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.DeleteAsync<Card>(id);
+            return await Database.DeleteAsync<Card>(id);
         }
 
         /// <summary>
@@ -320,7 +338,7 @@ namespace ChineseVocab.Services
         public async Task<int> GetCardCountAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().CountAsync();
+            return await Database.Table<Card>().CountAsync();
         }
 
         /// <summary>
@@ -329,7 +347,7 @@ namespace ChineseVocab.Services
         public async Task<int> GetCardCountByHskLevelAsync(int hskLevel)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Card>().Where(c => c.HskLevel == hskLevel && c.IsActive).CountAsync();
+            return await Database.Table<Card>().Where(c => c.HskLevel == hskLevel && c.IsActive).CountAsync();
         }
 
         /// <summary>
@@ -343,7 +361,7 @@ namespace ChineseVocab.Services
             {
                 card.CreatedDate = DateTime.UtcNow;
                 card.ModifiedDate = DateTime.UtcNow;
-                await _database.InsertAsync(card);
+                await Database.InsertAsync(card);
                 count++;
             }
             return count;
@@ -359,7 +377,7 @@ namespace ChineseVocab.Services
         public async Task<SRSStat> GetSRSStatisticsByCardIdAsync(int cardId)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<SRSStat>().Where(s => s.CardId == cardId).FirstOrDefaultAsync();
+            return await Database.Table<SRSStat>().Where(s => s.CardId == cardId).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -368,7 +386,7 @@ namespace ChineseVocab.Services
         public async Task<List<SRSStat>> GetAllSRSStatisticsAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<SRSStat>().ToListAsync();
+            return await Database.Table<SRSStat>().ToListAsync();
         }
 
         /// <summary>
@@ -383,13 +401,13 @@ namespace ChineseVocab.Services
             if (existing == null)
             {
                 statistics.CreatedDate = DateTime.UtcNow;
-                return await _database.InsertAsync(statistics);
+                return await Database.InsertAsync(statistics);
             }
             else
             {
                 statistics.Id = existing.Id;
                 statistics.CreatedDate = existing.CreatedDate;
-                return await _database.UpdateAsync(statistics);
+                return await Database.UpdateAsync(statistics);
             }
         }
 
@@ -399,7 +417,7 @@ namespace ChineseVocab.Services
         public async Task<int> DeleteSRSStatisticsAsync(int cardId)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<SRSStat>().DeleteAsync(s => s.CardId == cardId);
+            return await Database.Table<SRSStat>().DeleteAsync(s => s.CardId == cardId);
         }
 
         /// <summary>
@@ -408,7 +426,7 @@ namespace ChineseVocab.Services
         public async Task<List<SRSStat>> GetSRSStatisticsByNextReviewDateAsync(DateTime date)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<SRSStat>()
+            return await Database.Table<SRSStat>()
                 .Where(s => s.NextReviewDate.Date == date.Date)
                 .ToListAsync();
         }
@@ -419,7 +437,7 @@ namespace ChineseVocab.Services
         public async Task<int> GetReviewCountForDateAsync(DateTime date)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<SRSStat>()
+            return await Database.Table<SRSStat>()
                 .Where(s => s.NextReviewDate.Date == date.Date)
                 .CountAsync();
         }
@@ -430,19 +448,65 @@ namespace ChineseVocab.Services
         public async Task<StudySummary> GetStudySummaryAsync()
         {
             await EnsureInitializedAsync();
-            // Временная заглушка
+
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
+
+            // Общее количество активных карточек
+            int totalCards = await Database.Table<Card>().Where(c => c.IsActive).CountAsync();
+
+            // Количество выученных карточек (IsLearned = true)
+            int cardsLearned = await Database.Table<SRSStat>().Where(s => s.IsLearned).CountAsync();
+
+            // Количество карточек для повторения (дата наступила)
+            int cardsToReview = await Database.Table<SRSStat>()
+                .Where(s => s.NextReviewDate <= today)
+                .CountAsync();
+
+            // Количество карточек к повторению сегодня
+            int cardsDueToday = await Database.Table<SRSStat>()
+                .Where(s => s.NextReviewDate.Date == today)
+                .CountAsync();
+
+            // Количество карточек к повторению завтра
+            int cardsDueTomorrow = await Database.Table<SRSStat>()
+                .Where(s => s.NextReviewDate.Date == tomorrow)
+                .CountAsync();
+
+            // Средний E-Factor по всем карточкам
+            var allStats = await Database.Table<SRSStat>().ToListAsync();
+            double avgEFactor = allStats.Count > 0 ? allStats.Average(s => s.EFactor) : 2.5;
+
+            // Количество дней с активностью (уникальные даты LastReviewed)
+            int totalStudyDays = allStats
+                .Where(s => s.LastReviewed > DateTime.MinValue)
+                .Select(s => s.LastReviewed.Date)
+                .Distinct()
+                .Count();
+
+            // Дата последнего изучения
+            DateTime lastStudyDate = allStats.Count > 0
+                ? allStats.Max(s => s.LastReviewed)
+                : DateTime.MinValue;
+
+            // Текущая серия (максимальный CorrectStreak среди всех карточек)
+            int currentStreak = allStats.Count > 0 ? allStats.Max(s => s.CorrectStreak) : 0;
+
+            // Максимальная серия — сохраняется в БД? Пока используем текущую
+            int maxStreak = currentStreak;
+
             return new StudySummary
             {
-                TotalCards = await GetCardCountAsync(),
-                CardsLearned = 0,
-                CardsToReview = 0,
-                CardsDueToday = 0,
-                CardsDueTomorrow = 0,
-                AverageEaseFactor = 2.5,
-                TotalStudyDays = 0,
-                LastStudyDate = DateTime.MinValue,
-                CurrentStreak = 0,
-                MaxStreak = 0
+                TotalCards = totalCards,
+                CardsLearned = cardsLearned,
+                CardsToReview = cardsToReview,
+                CardsDueToday = cardsDueToday,
+                CardsDueTomorrow = cardsDueTomorrow,
+                AverageEaseFactor = Math.Round(avgEFactor, 2),
+                TotalStudyDays = totalStudyDays,
+                LastStudyDate = lastStudyDate,
+                CurrentStreak = currentStreak,
+                MaxStreak = maxStreak
             };
         }
 
@@ -456,7 +520,7 @@ namespace ChineseVocab.Services
         public async Task<List<Deck>> GetAllDecksAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Deck>().Where(d => d.IsActive).ToListAsync();
+            return await Database.Table<Deck>().Where(d => d.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -465,7 +529,7 @@ namespace ChineseVocab.Services
         public async Task<Deck> GetDeckByIdAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Deck>().Where(d => d.Id == id).FirstOrDefaultAsync();
+            return await Database.Table<Deck>().Where(d => d.Id == id).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -476,7 +540,7 @@ namespace ChineseVocab.Services
             await EnsureInitializedAsync();
             deck.CreatedDate = DateTime.UtcNow;
             deck.ModifiedDate = DateTime.UtcNow;
-            return await _database.InsertAsync(deck);
+            return await Database.InsertAsync(deck);
         }
 
         /// <summary>
@@ -486,7 +550,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             deck.ModifiedDate = DateTime.UtcNow;
-            return await _database.UpdateAsync(deck);
+            return await Database.UpdateAsync(deck);
         }
 
         /// <summary>
@@ -495,7 +559,7 @@ namespace ChineseVocab.Services
         public async Task<int> DeleteDeckAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.DeleteAsync<Deck>(id);
+            return await Database.DeleteAsync<Deck>(id);
         }
 
         /// <summary>
@@ -504,7 +568,7 @@ namespace ChineseVocab.Services
         public async Task<int> AddCardToDeckAsync(int cardId, int deckId)
         {
             await EnsureInitializedAsync();
-            return await _database.ExecuteAsync(
+            return await Database.ExecuteAsync(
                 "INSERT OR IGNORE INTO CardDeck (CardId, DeckId, AddedDate) VALUES (?, ?, ?)",
                 cardId, deckId, DateTime.UtcNow);
         }
@@ -515,7 +579,7 @@ namespace ChineseVocab.Services
         public async Task<int> RemoveCardFromDeckAsync(int cardId, int deckId)
         {
             await EnsureInitializedAsync();
-            return await _database.ExecuteAsync(
+            return await Database.ExecuteAsync(
                 "DELETE FROM CardDeck WHERE CardId = ? AND DeckId = ?",
                 cardId, deckId);
         }
@@ -526,7 +590,7 @@ namespace ChineseVocab.Services
         public async Task<int> GetCardCountInDeckAsync(int deckId)
         {
             await EnsureInitializedAsync();
-            var result = await _database.ExecuteScalarAsync<int>(
+            var result = await Database.ExecuteScalarAsync<int>(
                 "SELECT COUNT(*) FROM CardDeck WHERE DeckId = ?",
                 deckId);
             return result;
@@ -539,7 +603,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             var today = DateTime.UtcNow.Date;
-            return await _database.QueryAsync<Card>(
+            return await Database.QueryAsync<Card>(
                 @"SELECT c.* FROM Cards c
                   INNER JOIN CardDeck cd ON c.Id = cd.CardId
                   INNER JOIN SRSStatistics s ON c.Id = s.CardId
@@ -560,7 +624,7 @@ namespace ChineseVocab.Services
         public async Task<List<Sentence>> GetSentencesByCardIdAsync(int cardId)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Sentence>().Where(s => s.CardId == cardId && s.IsActive).ToListAsync();
+            return await Database.Table<Sentence>().Where(s => s.CardId == cardId && s.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -569,7 +633,7 @@ namespace ChineseVocab.Services
         public async Task<List<Sentence>> GetAllSentencesAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<Sentence>().Where(s => s.IsActive).ToListAsync();
+            return await Database.Table<Sentence>().Where(s => s.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -580,7 +644,7 @@ namespace ChineseVocab.Services
             await EnsureInitializedAsync();
             sentence.CreatedDate = DateTime.UtcNow;
             sentence.ModifiedDate = DateTime.UtcNow;
-            return await _database.InsertAsync(sentence);
+            return await Database.InsertAsync(sentence);
         }
 
         /// <summary>
@@ -590,7 +654,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             sentence.ModifiedDate = DateTime.UtcNow;
-            return await _database.UpdateAsync(sentence);
+            return await Database.UpdateAsync(sentence);
         }
 
         /// <summary>
@@ -599,7 +663,7 @@ namespace ChineseVocab.Services
         public async Task<int> DeleteSentenceAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.DeleteAsync<Sentence>(id);
+            return await Database.DeleteAsync<Sentence>(id);
         }
 
         /// <summary>
@@ -609,7 +673,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             searchText = searchText.ToLower();
-            return await _database.Table<Sentence>()
+            return await Database.Table<Sentence>()
                 .Where(s => s.IsActive &&
                     (s.ChineseText.ToLower().Contains(searchText) ||
                      s.Pinyin.ToLower().Contains(searchText) ||
@@ -627,7 +691,7 @@ namespace ChineseVocab.Services
         public async Task<List<CharacterType>> GetAllCharacterTypesAsync()
         {
             await EnsureInitializedAsync();
-            return await _database.Table<CharacterType>().Where(ct => ct.IsActive).ToListAsync();
+            return await Database.Table<CharacterType>().Where(ct => ct.IsActive).ToListAsync();
         }
 
         /// <summary>
@@ -636,7 +700,7 @@ namespace ChineseVocab.Services
         public async Task<CharacterType> GetCharacterTypeByIdAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<CharacterType>().Where(ct => ct.Id == id).FirstOrDefaultAsync();
+            return await Database.Table<CharacterType>().Where(ct => ct.Id == id).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -645,7 +709,7 @@ namespace ChineseVocab.Services
         public async Task<CharacterType> GetCharacterTypeByNameAsync(string name)
         {
             await EnsureInitializedAsync();
-            return await _database.Table<CharacterType>().Where(ct => ct.Name == name && ct.IsActive).FirstOrDefaultAsync();
+            return await Database.Table<CharacterType>().Where(ct => ct.Name == name && ct.IsActive).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -656,7 +720,7 @@ namespace ChineseVocab.Services
             await EnsureInitializedAsync();
             characterType.CreatedDate = DateTime.UtcNow;
             characterType.ModifiedDate = DateTime.UtcNow;
-            return await _database.InsertAsync(characterType);
+            return await Database.InsertAsync(characterType);
         }
 
         /// <summary>
@@ -666,7 +730,7 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
             characterType.ModifiedDate = DateTime.UtcNow;
-            return await _database.UpdateAsync(characterType);
+            return await Database.UpdateAsync(characterType);
         }
 
         /// <summary>
@@ -675,7 +739,7 @@ namespace ChineseVocab.Services
         public async Task<int> DeleteCharacterTypeAsync(int id)
         {
             await EnsureInitializedAsync();
-            return await _database.DeleteAsync<CharacterType>(id);
+            return await Database.DeleteAsync<CharacterType>(id);
         }
 
         #endregion
@@ -758,7 +822,7 @@ namespace ChineseVocab.Services
         public async Task ExecuteInTransactionAsync(Func<Task> action)
         {
             await EnsureInitializedAsync();
-            await _database.RunInTransactionAsync(conn =>
+            await Database.RunInTransactionAsync(conn =>
             {
                 // SQLite-net не поддерживает async в транзакциях, выполняем синхронно
                 action().GetAwaiter().GetResult();
@@ -771,11 +835,11 @@ namespace ChineseVocab.Services
         public async Task ClearAllDataAsync()
         {
             await EnsureInitializedAsync();
-            await _database.DeleteAllAsync<Card>();
-            await _database.DeleteAllAsync<Deck>();
-            await _database.DeleteAllAsync<Sentence>();
-            await _database.DeleteAllAsync<CharacterType>();
-            await _database.DeleteAllAsync<SRSStat>();
+            await Database.DeleteAllAsync<Card>();
+            await Database.DeleteAllAsync<Deck>();
+            await Database.DeleteAllAsync<Sentence>();
+            await Database.DeleteAllAsync<CharacterType>();
+            await Database.DeleteAllAsync<SRSStat>();
         }
 
         /// <summary>
@@ -788,7 +852,7 @@ namespace ChineseVocab.Services
             foreach (var card in cards)
             {
                 card.ModifiedDate = DateTime.UtcNow;
-                await _database.UpdateAsync(card);
+                await Database.UpdateAsync(card);
                 count++;
             }
             return count;
