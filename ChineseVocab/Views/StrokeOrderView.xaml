@@ -29,11 +29,25 @@
                        CornerRadius="8"
                        BackgroundColor="{StaticResource Surface}"
                        HasShadow="True">
-                    <Label Text="{Binding Character}"
-                           FontSize="48"
-                           FontFamily="Microsoft YaHei"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                    <VerticalStackLayout Spacing="8"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center">
+                        <Label Text="{Binding Character}"
+                               FontSize="48"
+                               FontFamily="Microsoft YaHei"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                        <Button x:Name="SpeakCharButton"
+                                Text="🔊"
+                                Clicked="OnSpeakCharacterClicked"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="18"
+                                WidthRequest="40"
+                                HeightRequest="36"
+                                Padding="0"
+                                HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
                 </Frame>
 
                 <!-- Info -->

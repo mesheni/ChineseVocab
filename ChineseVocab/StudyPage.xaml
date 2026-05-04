@@ -149,23 +149,51 @@
                                  HorizontalOptions="Center"
                                  VerticalOptions="Center">
 
-                <!-- Иероглиф -->
-                <Label Text="{Binding CurrentCard.Character}"
-                       FontSize="{OnIdiom Phone=40, Tablet=64, Desktop=72}"
-                       FontFamily="Microsoft YaHei"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       VerticalOptions="Center"/>
+                <!-- Иероглиф с кнопкой озвучки -->
+                <Grid ColumnDefinitions="*,Auto" HorizontalOptions="Center">
+                    <Label Grid.Column="0"
+                           Text="{Binding CurrentCard.Character}"
+                           FontSize="{OnIdiom Phone=40, Tablet=64, Desktop=72}"
+                           FontFamily="Microsoft YaHei"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="SpeakCharacterButton"
+                            Text="🔊"
+                            Clicked="OnSpeakCharacterClicked"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            FontSize="{OnIdiom Phone=20, Tablet=28, Desktop=32}"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            Padding="0"
+                            VerticalOptions="Center"/>
+                </Grid>
 
                 <!-- Если показан ответ, отображаем пиньинь и перевод -->
                 <VerticalStackLayout Spacing="{OnIdiom Phone=10, Tablet=15, Desktop=20}"
                                      IsVisible="{Binding IsAnswerVisible}">
 
-                    <!-- Пиньинь -->
-                    <Label Text="{Binding CurrentCard.Pinyin}"
-                           FontSize="{OnIdiom Phone=18, Tablet=24, Desktop=28}"
-                           HorizontalOptions="Center"
-                           TextColor="{StaticResource Primary}"/>
+                    <!-- Пиньинь с кнопкой озвучки -->
+                    <Grid ColumnDefinitions="*,Auto" HorizontalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="{Binding CurrentCard.Pinyin}"
+                               FontSize="{OnIdiom Phone=18, Tablet=24, Desktop=28}"
+                               HorizontalOptions="Center"
+                               TextColor="{StaticResource Primary}"/>
+                        <Button Grid.Column="1"
+                                x:Name="SpeakPinyinButton"
+                                Text="🔊"
+                                Clicked="OnSpeakPinyinClicked"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Secondary}"
+                                FontSize="{OnIdiom Phone=14, Tablet=18, Desktop=22}"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                Padding="0"
+                                VerticalOptions="Center"/>
+                    </Grid>
 
                     <!-- Перевод -->
                     <Label Text="{Binding CurrentCard.Definition}"

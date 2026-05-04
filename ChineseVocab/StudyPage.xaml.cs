@@ -1,3 +1,4 @@
+using ChineseVocab.Services.Audio;
 using ChineseVocab.ViewModels;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -130,6 +131,10 @@ namespace ChineseVocab
         {
             base.OnDisappearing();
 
+            // Останавливаем TTS при уходе со страницы
+            var tts = GetTtsService();
+            tts?.Stop();
+
             // Отписываемся от событий при скрытии страницы
             if (_viewModel != null)
             {
@@ -148,6 +153,55 @@ namespace ChineseVocab
             ResetCardFlip();
         }
 
+        /// <summary>
+        /// Обработчик кнопки озвучки иероглифа.
+        /// </summary>
+        private async void OnSpeakCharacterClicked(object? sender, EventArgs e)
+        {
+            var tts = GetTtsService();
+            if (tts is null) return;
+
+            if (_viewModel?.CurrentCard?.Character is string character && !string.IsNullOrWhiteSpace(character))
+            {
+                try
+                {
+                    await tts.SpeakChineseAsync(character);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"TTS error (character): {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Обработчик кнопки озвучки пиньиня.
+        /// </summary>
+        private async void OnSpeakPinyinClicked(object? sender, EventArgs e)
+        {
+            var tts = GetTtsService();
+            if (tts is null) return;
+
+            if (_viewModel?.CurrentCard?.Pinyin is string pinyin && !string.IsNullOrWhiteSpace(pinyin))
+            {
+                try
+                {
+                    await tts.SpeakPinyinAsync(pinyin);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"TTS error (pinyin): {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Получает ITextToSpeechService из DI-контейнера приложения.
+        /// </summary>
+        private static ITextToSpeechService? GetTtsService()
+        {
+            return Application.Current?.Handler?.MauiContext?.Services.GetService<ITextToSpeechService>();
+        }
 
     }
 }

@@ -4,6 +4,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using ChineseVocab.ViewModels;
 using ChineseVocab.Services;
+using ChineseVocab.Services.Audio;
 
 namespace ChineseVocab
 {
@@ -55,6 +56,9 @@ namespace ChineseVocab
             // Регистрация сервиса планирования повторений
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<ISchedulerService, SchedulerService>();
+
+            // Регистрация сервиса аудио-озвучки (TextToSpeech)
+            services.AddSingleton<ITextToSpeechService, TextToSpeechService>();
         }
 
         private static void RegisterViewModels(IServiceCollection services)

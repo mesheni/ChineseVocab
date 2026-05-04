@@ -5,6 +5,7 @@ using SkiaSharp.Views.Maui;
 using Microsoft.Maui.Controls;
 using ChineseVocab.ViewModels;
 using ChineseVocab.Services;
+using ChineseVocab.Services.Audio;
 
 namespace ChineseVocab.Views
 {
@@ -334,6 +335,35 @@ namespace ChineseVocab.Views
             _completedStrokePaint?.Dispose();
             _currentStrokePaint?.Dispose();
             _gridPaint?.Dispose();
+        }
+
+        /// <summary>
+        /// Обработчик кнопки озвучки иероглифа.
+        /// </summary>
+        private async void OnSpeakCharacterClicked(object? sender, EventArgs e)
+        {
+            var tts = GetTtsService();
+            if (tts is null) return;
+
+            if (_viewModel?.Character is string character && !string.IsNullOrWhiteSpace(character))
+            {
+                try
+                {
+                    await tts.SpeakChineseAsync(character);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"TTS error (stroke order): {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Получает ITextToSpeechService из DI-контейнера приложения.
+        /// </summary>
+        private static ITextToSpeechService? GetTtsService()
+        {
+            return Application.Current?.Handler?.MauiContext?.Services.GetService<ITextToSpeechService>();
         }
     }
 }
