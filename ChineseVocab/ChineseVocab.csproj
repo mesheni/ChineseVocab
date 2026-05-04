@@ -85,13 +85,6 @@
 		<Folder Include="Extensions\" />
 		<Folder Include="SRS\" />
 		<Folder Include="Utils\" />
-		<Folder Include="Tests\" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="Tests\**" />
-	</ItemGroup>
-
-
 
 </Project>

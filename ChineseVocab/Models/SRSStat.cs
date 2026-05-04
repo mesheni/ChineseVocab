@@ -1,6 +1,6 @@
 using SQLite;
 using CommunityToolkit.Mvvm.ComponentModel;
-// using ChineseVocab.SRS; - временно закомментировано из-за ошибок компиляции
+using ChineseVocab.SRS;
 
 namespace ChineseVocab.Models
 {
@@ -145,8 +145,8 @@ namespace ChineseVocab.Models
         {
             CardId = cardId;
             NextReviewDate = DateTime.UtcNow.Date; // Первое повторение сегодня
-            Interval = ChineseVocab.SRS.SRSEngine.FirstReviewInterval;
-            EFactor = ChineseVocab.SRS.SRSEngine.DefaultEFactor;
+            Interval = SRSEngine.FirstReviewInterval;
+            EFactor = SRSEngine.DefaultEFactor;
             RepetitionCount = 0;
             EaseScore = 3;
             LastReviewed = DateTime.MinValue;
@@ -175,9 +175,9 @@ namespace ChineseVocab.Models
 
             // Используем SRSEngine для обработки повторения
             var (newInterval, newRepetitionCount, newEFactor) =
-                ChineseVocab.SRS.SRSEngine.ProcessReview(Interval, RepetitionCount, EFactor, quality);
+                            SRSEngine.ProcessReview(Interval, RepetitionCount, EFactor, quality);
 
-            if (quality < ChineseVocab.SRS.SRSEngine.MinimumPassingQuality)
+            if (quality < SRSEngine.MinimumPassingQuality)
             {
                 // Неправильный или плохой ответ - сбрасываем прогресс
                 RepetitionCount = 0;
@@ -200,7 +200,7 @@ namespace ChineseVocab.Models
             NextReviewDate = DateTime.UtcNow.AddDays(Interval);
 
             // Проверяем, выучена ли карточка
-            if (ChineseVocab.SRS.SRSEngine.IsCardLearned(Interval) && !IsLearned)
+            if (SRSEngine.IsCardLearned(Interval) && !IsLearned)
             {
                 IsLearned = true;
                 LearnedDate = DateTime.UtcNow;
@@ -242,7 +242,7 @@ namespace ChineseVocab.Models
         /// </summary>
         public void Reset()
         {
-            Interval = ChineseVocab.SRS.SRSEngine.FirstReviewInterval;
+            Interval = SRSEngine.FirstReviewInterval;
             RepetitionCount = 0;
             CorrectStreak = 0;
             NextReviewDate = DateTime.UtcNow.Date;

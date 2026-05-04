@@ -16,6 +16,13 @@ namespace ChineseVocab.Services
         private SRSSettings _settings;
         private bool _isInitialized = false;
 
+        // Кэши для часто запрашиваемых данных
+        private List<Card>? _cachedDueCards;
+        private DateTime _dueCardsCacheTime = DateTime.MinValue;
+        private SRSStudySummary? _cachedSummary;
+        private DateTime _summaryCacheTime = DateTime.MinValue;
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
+
         /// <summary>
         /// Конструктор сервиса SRS.
         /// </summary>
@@ -50,6 +57,9 @@ namespace ChineseVocab.Services
             // Сохраняем обновленную статистику
             await SaveSRSStatAsync(stat);
 
+            // Инвалидируем кэш, так как данные изменились
+            InvalidateCache();
+
             return stat;
         }
 
@@ -59,6 +69,12 @@ namespace ChineseVocab.Services
         public async Task<List<Card>> GetDueCardsAsync(int limit = 0)
         {
             await EnsureInitializedAsync();
+
+            // Проверяем кэш (только если без лимита)
+            if (limit == 0 && IsCacheValid(_dueCardsCacheTime) && _cachedDueCards != null)
+            {
+                return _cachedDueCards;
+            }
 
             // Получаем всю статистику SRS
             var allStats = await _databaseService.GetAllSRSStatisticsAsync();
@@ -82,6 +98,10 @@ namespace ChineseVocab.Services
                     break;
                 }
             }
+
+            // Обновляем кэш
+            _cachedDueCards = dueCards;
+            _dueCardsCacheTime = DateTime.UtcNow;
 
             return dueCards;
         }
@@ -189,6 +209,12 @@ namespace ChineseVocab.Services
         {
             await EnsureInitializedAsync();
 
+            // Проверяем кэш
+            if (IsCacheValid(_summaryCacheTime) && _cachedSummary != null)
+            {
+                return _cachedSummary;
+            }
+
             var allCards = await _databaseService.GetAllCardsAsync();
             var allStats = await _databaseService.GetAllSRSStatisticsAsync();
 
@@ -204,7 +230,7 @@ namespace ChineseVocab.Services
             // Рассчитываем общее время изучения (предполагаем 10 секунд на повторение)
             var totalStudySeconds = allStats.Sum(s => s.TotalStudyTimeSeconds);
 
-            return new SRSStudySummary
+            var summary = new SRSStudySummary
             {
                 TotalCards = allCards.Count,
                 DueCardsToday = dueCards.Count,
@@ -224,6 +250,12 @@ namespace ChineseVocab.Services
                     allStats.Max(s => s.LastReviewed) : DateTime.MinValue,
                 StudyStreakDays = 0 // TODO: Реализовать расчет серии дней изучения
             };
+
+            // Сохраняем в кэш
+            _cachedSummary = summary;
+            _summaryCacheTime = DateTime.UtcNow;
+
+            return summary;
         }
 
         /// <summary>
@@ -563,8 +595,27 @@ namespace ChineseVocab.Services
         /// </summary>
         public Task ClearCacheAsync()
         {
-            // В текущей реализации кэша нет
+            InvalidateCache();
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Инвалидирует все внутренние кэши.
+        /// </summary>
+        private void InvalidateCache()
+        {
+            _cachedDueCards = null;
+            _dueCardsCacheTime = DateTime.MinValue;
+            _cachedSummary = null;
+            _summaryCacheTime = DateTime.MinValue;
+        }
+
+        /// <summary>
+        /// Проверяет, действителен ли кэш по времени последнего обновления.
+        /// </summary>
+        private static bool IsCacheValid(DateTime cacheTime)
+        {
+            return (DateTime.UtcNow - cacheTime) < CacheDuration;
         }
 
         #endregion

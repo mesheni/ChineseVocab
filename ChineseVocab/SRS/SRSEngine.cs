@@ -22,8 +22,9 @@ namespace ChineseVocab.SRS
 
         /// <summary>
         /// Максимальное значение фактора легкости.
+        /// Значение 4.0 позволяет EF расти для качественно выученных карточек.
         /// </summary>
-        public const double MaxEFactor = 2.5;
+        public const double MaxEFactor = 4.0;
 
         /// <summary>
         /// Интервал первого повторения (в днях).
