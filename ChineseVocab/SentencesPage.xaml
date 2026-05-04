@@ -4,31 +4,165 @@
              x:Class="ChineseVocab.SentencesPage"
              Title="Примеры предложений">
 
-    <ContentPage.BindingContext>
-        <!-- ViewModel will be set later -->
-    </ContentPage.BindingContext>
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
+        <!-- Поиск -->
+        <SearchBar Grid.Row="0"
+                   Placeholder="Поиск по тексту предложения..."
+                   Text="{Binding SearchText}"
+                   SearchCommand="{Binding SearchCommand}"
+                   FontSize="14"/>
 
-            <Label Text="Примеры предложений"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="{StaticResource Primary}"/>
+        <!-- Фильтры -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8">
+                <!-- Сложность -->
+                <Frame Padding="8,4" CornerRadius="16" BackgroundColor="{StaticResource Surface}"
+                       HasShadow="False" BorderColor="{StaticResource Secondary}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="Сложность:" FontSize="13" VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding DifficultyLevels}"
+                                SelectedIndex="{Binding SelectedDifficulty}"
+                                FontSize="13" MinimumWidthRequest="60"/>
+                    </HorizontalStackLayout>
+                </Frame>
 
-            <Label Text="Здесь будут отображаться примеры предложений с китайскими словами и их переводом."
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"/>
+                <!-- Источник -->
+                <Frame Padding="8,4" CornerRadius="16" BackgroundColor="{StaticResource Surface}"
+                       HasShadow="False" BorderColor="{StaticResource Secondary}">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="Источник:" FontSize="13" VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding Sources}"
+                                SelectedItem="{Binding SelectedSource}"
+                                FontSize="13" MinimumWidthRequest="110"/>
+                    </HorizontalStackLayout>
+                </Frame>
+            </HorizontalStackLayout>
+        </ScrollView>
 
-            <Label Text="Страница в разработке..."
-                   FontSize="14"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"
-                   TextColor="{StaticResource Secondary}"/>
+        <!-- Сводка -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <Label Text="{Binding ResultSummary}" FontSize="14" TextColor="{StaticResource Secondary}"
+                   VerticalOptions="Center"/>
+            <ActivityIndicator Grid.Column="1"
+                               IsRunning="{Binding IsSearching}"
+                               IsVisible="{Binding IsSearching}"
+                               HeightRequest="20" WidthRequest="20"
+                               Color="{StaticResource Primary}"
+                               HorizontalOptions="End"/>
+        </Grid>
 
-        </VerticalStackLayout>
-    </ScrollView>
+        <!-- Список предложений -->
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Sentences}"
+                        SelectionMode="None">
 
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="14" Margin="0,3" CornerRadius="12"
+                           BackgroundColor="{StaticResource Surface}" HasShadow="True">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <!-- Китайский текст + кнопка озвучки -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0"
+                                       Text="{Binding ChineseText}"
+                                       FontSize="20"
+                                       FontFamily="Microsoft YaHei"
+                                       LineBreakMode="WordWrap"
+                                       VerticalOptions="Center"/>
+                                <Button Grid.Column="1"
+                                        Text="🔊"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource Primary}"
+                                        FontSize="18"
+                                        WidthRequest="44"
+                                        HeightRequest="44"
+                                        Padding="0"
+                                        VerticalOptions="Center"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SpeakSentenceCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </Grid>
+
+                            <!-- Пиньинь (цветной) -->
+                            <Label FormattedText="{Binding FormattedPinyin}"
+                                   FontSize="15"
+                                   LineBreakMode="WordWrap"/>
+
+                            <!-- Раскрывашка: перевод -->
+                            <VerticalStackLayout Spacing="4" IsVisible="{Binding IsExpanded}">
+                                <BoxView HeightRequest="1" Color="{StaticResource Secondary}" Margin="0,4"/>
+                                <Label Text="{Binding Translation}"
+                                       FontSize="16"
+                                       FontAttributes="Italic"
+                                       LineBreakMode="WordWrap"/>
+
+                                <!-- Объяснение (если есть) -->
+                                <Label Text="{Binding Explanation}"
+                                       FontSize="13"
+                                       TextColor="{StaticResource Secondary}"
+                                       LineBreakMode="WordWrap"
+                                       IsVisible="{Binding HasExplanation}"
+                                       Margin="0,4,0,0"/>
+                            </VerticalStackLayout>
+
+                            <!-- Нижняя строка: сложность + источник + кнопка раскрытия -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                <HorizontalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding DifficultyLabel}"
+                                           FontSize="13" VerticalOptions="Center"/>
+                                    <Label Text="{Binding Source}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource Secondary}"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding HasSource}"/>
+                                </HorizontalStackLayout>
+
+                                <Button Grid.Column="2"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource Primary}"
+                                        FontSize="13"
+                                        Padding="8,4"
+                                        VerticalOptions="Center"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleExpandCommand}"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Text>
+                                        <MultiBinding StringFormat="{}{0}">
+                                            <Binding Path="IsExpanded"/>
+                                        </MultiBinding>
+                                    </Button.Text>
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsExpanded}"
+                                                     Value="True">
+                                            <Setter Property="Text" Value="▲ Скрыть"/>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsExpanded}"
+                                                     Value="False">
+                                            <Setter Property="Text" Value="▼ Перевод"/>
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Padding="40">
+                    <Label Text="📝" FontSize="48" HorizontalOptions="Center"/>
+                    <Label Text="{Binding ResultSummary}" FontSize="18" HorizontalOptions="Center"
+                           TextColor="{StaticResource Secondary}"/>
+                    <Label Text="Измените фильтры или поисковый запрос."
+                           FontSize="14" HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Secondary}"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </Grid>
 </ContentPage>

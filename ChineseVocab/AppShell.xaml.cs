@@ -9,6 +9,7 @@
             // Регистрация маршрутов для навигации
             Routing.RegisterRoute("characterDetail", typeof(Views.CharacterDetailPage));
             Routing.RegisterRoute("strokeOrder", typeof(Views.StrokeOrderPage));
+            Routing.RegisterRoute("sentences", typeof(SentencesPage));
         }
     }
 }
